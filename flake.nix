@@ -1,5 +1,5 @@
 {
-  description = "Rust dev environment for IronScribe";
+  description = "Rust project using fenix and rust-toolchain.toml";
 
   inputs = {
     nixpkgs.url = "github:NixOS/nixpkgs/nixos-unstable";
@@ -7,20 +7,23 @@
     fenix.url = "github:nix-community/fenix";
   };
 
-  outputs = { self, nixpkgs, flake-utils, fenix, ... }:
+  outputs = { nixpkgs, flake-utils, fenix, ... }:
     flake-utils.lib.eachDefaultSystem (system:
       let
         pkgs = import nixpkgs { inherit system; };
-        toolchain = fenix.packages.${system}.complete; # or .stable.toolchain
+        rust-toolchain = fenix.packages.${system}.fromToolchainFile {
+          file = ./rust-toolchain.toml;
+          sha256 = "sha256-X/4ZBHO3iW0fOenQ3foEvscgAPJYl2abspaBThDOukI=";
+        };
       in {
         devShells.default = pkgs.mkShell {
-          packages = [
-            toolchain
+          buildInputs = [
+            rust-toolchain
+            pkgs.cargo
             pkgs.pkg-config
             pkgs.openssl
           ];
-          RUST_SRC_PATH = "${toolchain}/lib/rustlib/src/rust/library";
+          RUST_BACKTRACE = "1";
         };
-      }
-    );
+      });
 }
