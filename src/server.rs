@@ -1,10 +1,10 @@
 use tonic::{transport::Server, Request, Response, Status};
 
-use ironscribe_common::hello_world::greeter_server::{Greeter, GreeterServer};
-use ironscribe_common::hello_world::{HelloReply, HelloRequest};
+use hello_world::greeter_server::{Greeter, GreeterServer};
+use hello_world::{HelloReply, HelloRequest};
 
 pub mod hello_world {
-    tonic::include_proto!("ironscribe-common/helloworld");
+    tonic::include_proto!("helloworld");
 }
 
 #[derive(Debug, Default)]
@@ -12,7 +12,10 @@ pub struct MyGreeter {}
 
 #[tonic::async_trait]
 impl Greeter for MyGreeter {
-    async fn say_hello(&self, request: Request<HelloRequest>) -> Result<Response<HelloReply>, Status> {
+    async fn say_hello(
+        &self,
+        request: Request<HelloRequest>,
+    ) -> Result<Response<HelloReply>, Status> {
         println!("Got a request: {:?}", request);
 
         let reply = HelloReply {
@@ -24,13 +27,14 @@ impl Greeter for MyGreeter {
 }
 
 #[tokio::main]
-async fn main() -> Result<(), Box<dyn std::error::Error>>{
-    println!("Hello, world from server!");
-
+async fn main() -> Result<(), Box<dyn std::error::Error>> {
     let addr = "[::1]:50051".parse()?;
     let greeter = MyGreeter::default();
 
-    Server::builder().add_service(GreeterServer::new(greeter)).serve(addr).await?;
+    Server::builder()
+        .add_service(GreeterServer::new(greeter))
+        .serve(addr)
+        .await?;
 
     Ok(())
 }
