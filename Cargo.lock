@@ -142,15 +142,8 @@ checksum = "baf1de4339761588bc0619e3cbc0120ee582ebb74b53b4efbf79117bd2da40fd"
 [[package]]
 name = "client"
 version = "0.1.0"
-
-[[package]]
-name = "common"
-version = "0.1.0"
 dependencies = [
- "prost",
- "tokio",
- "tonic",
- "tonic-build",
+ "ironscribe-common",
 ]
 
 [[package]]
@@ -390,6 +383,16 @@ checksum = "cea70ddb795996207ad57735b50c5982d8844f38ba9ee5f1aedcfb708a2aa11e"
 dependencies = [
  "equivalent",
  "hashbrown",
+]
+
+[[package]]
+name = "ironscribe-common"
+version = "0.1.0"
+dependencies = [
+ "prost",
+ "tokio",
+ "tonic",
+ "tonic-build",
 ]
 
 [[package]]
@@ -695,6 +698,9 @@ dependencies = [
 [[package]]
 name = "server"
 version = "0.1.0"
+dependencies = [
+ "ironscribe-common",
+]
 
 [[package]]
 name = "slab"
