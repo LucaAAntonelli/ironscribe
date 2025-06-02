@@ -11,6 +11,14 @@ path = "src/server.rs"
 name = "client"
 path = "src/client.rs"
 
+[[bin]]
+name = "filetransfer-client"
+path = "src/filetransfer-client.rs"
+
+[[bin]]
+name = "filetransfer-server"
+path = "src/filetransfer-server.rs"
+
 [dependencies]
 tonic = "*"
 prost = "0.13"

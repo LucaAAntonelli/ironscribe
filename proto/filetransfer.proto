@@ -1,0 +1,17 @@
+syntax = "proto3";
+
+package filetransfer;
+
+service FileService {
+    rpc Upload(stream FileUploadRequest) returns(FileUploadResponse);
+}
+
+message FileUploadRequest {
+    string filename = 1;
+    bytes chunk = 2;
+}
+
+message FileUploadResponse {
+    string filename = 1;
+    uint32 size = 2;
+}
