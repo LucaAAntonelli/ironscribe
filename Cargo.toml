@@ -19,10 +19,22 @@ path = "src/filetransfer-client.rs"
 name = "filetransfer-server"
 path = "src/filetransfer-server.rs"
 
+[[bin]]
+name = "gpt-client"
+path = "src/gpt-client.rs"
+
+[[bin]]
+name = "gpt-server"
+path = "src/gpt-server.rs"
+
+
 [dependencies]
 tonic = "*"
 prost = "0.13"
-tokio = { version = "1.0", features = ["macros", "rt-multi-thread"] }
+tokio = { version = "1.0", features = ["full"] }
+uuid = { version = "1", features = ["v4"]}
+async-stream = "0.3"
+tokio-stream = "0.1"
 
 [build-dependencies]
 tonic-build = "*"
