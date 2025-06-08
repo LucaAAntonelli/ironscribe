@@ -1,6 +1,6 @@
 use tonic::{transport::Server, Request, Response, Status};
 use file_transfer::file_transfer_server::{FileTransfer, FileTransferServer};
-use file_transfer::{FileUploadRequest, UploadStatus};
+use file_transfer::{FileUploadRequest, FileUploadResponse};
 use tokio::fs::File;
 use tokio::io::AsyncWriteExt;
 use uuid::Uuid;
@@ -17,9 +17,9 @@ impl FileTransfer for MyFileTransfer {
     async fn upload(
         &self,
         request: Request<tonic::Streaming<FileUploadRequest>>,
-    ) -> Result<Response<UploadStatus>, Status> {
+    ) -> Result<Response<FileUploadResponse>, Status> {
         let mut stream = request.into_inner();
-        let mut total_size: i64 = 0;
+        let mut total_size: u32 = 0;
         let upload_id = Uuid::new_v4().to_string();
         let mut filename = String::new();
         let mut file = None;
@@ -30,7 +30,7 @@ impl FileTransfer for MyFileTransfer {
             .map_err(|e| Status::internal(format!("Stream error: {}", e)))?
         {
             if file.is_none() {
-                filename = chunk.file_name.clone();
+                filename = chunk.filename.clone();
                 let path = format!("./uploads/{}-{}", upload_id, &filename);
                 let f = File::create(path)
                     .await
@@ -39,7 +39,7 @@ impl FileTransfer for MyFileTransfer {
             }
 
             let data = chunk.chunk;
-            total_size += data.len() as i64;
+            total_size += data.len() as u32;
             if let Some(f) = file.as_mut() {
                 f.write_all(&data)
                     .await
@@ -47,8 +47,8 @@ impl FileTransfer for MyFileTransfer {
             }
         }
 
-        Ok(Response::new(UploadStatus {
-            file_name: filename,
+        Ok(Response::new(FileUploadResponse {
+            filename: filename,
             size: total_size,
         }))
     }
