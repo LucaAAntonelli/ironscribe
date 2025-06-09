@@ -4,7 +4,6 @@ use proto::api::{
     upload_file_request, DownloadFileRequest, DownloadFileResponse, DownloadFolderRequest, DownloadFolderResponse, ListFilesRequest, ListFilesResponse, UploadFileRequest, UploadFileResponse, UploadFolderRequest, UploadFolderResponse
 };
 use std::path::PathBuf;
-use std::sync::mpsc::Receiver;
 use std::sync::Arc;
 use tokio::fs;
 use tokio::io::{AsyncReadExt, AsyncWriteExt};
@@ -102,8 +101,8 @@ impl FileService for FileServiceImpl {
 
     #[instrument(skip(self))]
     async fn download_folder(&self, request: Request<DownloadFolderRequest>) -> Result<Response<Self::DownloadFolderStream>, Status> {
-        let request = request.into_inner();
-        let (tx, rx) = mpsc::channel(Self::CHANNEL_SIZE);
+        let _request = request.into_inner();
+        let (_tx, rx) = mpsc::channel(Self::CHANNEL_SIZE);
 
         Ok(Response::new(ReceiverStream::new(rx)))
     }
@@ -155,7 +154,7 @@ impl FileService for FileServiceImpl {
     }
 
     #[instrument(skip(self))]
-    async fn upload_folder(&self, request: Request<UploadFolderRequest>) -> Result<Response<UploadFolderResponse>, Status> {
+    async fn upload_folder(&self, _request: Request<UploadFolderRequest>) -> Result<Response<UploadFolderResponse>, Status> {
 
         Ok(Response::new(UploadFolderResponse::default()))
     }
