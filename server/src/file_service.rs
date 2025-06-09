@@ -1,7 +1,9 @@
 use anyhow::anyhow;
 use proto::api::file_service_server::FileService;
 use proto::api::{
-    upload_file_request, DownloadFileRequest, DownloadFileResponse, DownloadFolderRequest, DownloadFolderResponse, ListFilesRequest, ListFilesResponse, UploadFileRequest, UploadFileResponse, UploadFolderRequest, UploadFolderResponse
+    upload_file_request, DownloadFileRequest, DownloadFileResponse, DownloadFolderRequest,
+    DownloadFolderResponse, ListFilesRequest, ListFilesResponse, UploadFileRequest,
+    UploadFileResponse, UploadFolderRequest, UploadFolderResponse,
 };
 use std::path::PathBuf;
 use std::sync::Arc;
@@ -100,7 +102,10 @@ impl FileService for FileServiceImpl {
     }
 
     #[instrument(skip(self))]
-    async fn download_folder(&self, request: Request<DownloadFolderRequest>) -> Result<Response<Self::DownloadFolderStream>, Status> {
+    async fn download_folder(
+        &self,
+        request: Request<DownloadFolderRequest>,
+    ) -> Result<Response<Self::DownloadFolderStream>, Status> {
         let _request = request.into_inner();
         let (_tx, rx) = mpsc::channel(Self::CHANNEL_SIZE);
 
@@ -154,8 +159,10 @@ impl FileService for FileServiceImpl {
     }
 
     #[instrument(skip(self))]
-    async fn upload_folder(&self, _request: Request<UploadFolderRequest>) -> Result<Response<UploadFolderResponse>, Status> {
-
+    async fn upload_folder(
+        &self,
+        _request: Request<UploadFolderRequest>,
+    ) -> Result<Response<UploadFolderResponse>, Status> {
         Ok(Response::new(UploadFolderResponse::default()))
     }
 

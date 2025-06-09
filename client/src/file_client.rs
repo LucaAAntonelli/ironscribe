@@ -127,7 +127,6 @@ impl FileClient<Channel> {
 
     #[instrument(skip(self))]
     pub async fn download_folder(&mut self, file: String, directory: PathBuf) -> Result<()> {
-        
         Ok(())
     }
 
@@ -198,7 +197,6 @@ impl FileClient<Channel> {
 
     #[instrument(skip(self))]
     pub async fn upload_folder(&mut self, file: String, directory: PathBuf) -> Result<()> {
-
         Ok(())
     }
 }
