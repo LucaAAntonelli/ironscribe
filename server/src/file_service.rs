@@ -182,9 +182,9 @@ impl FileService for FileServiceImpl {
 
                     while let Some(dir_entry) = dir_stream.next_entry().await? {
                         let file_metadata = dir_entry.metadata().await?;
-                        if !file_metadata.is_file() {
-                            continue;
-                        }
+                        // if !file_metadata.is_file() {
+                        //     continue;
+                        // }
                         let file_name = dir_entry.file_name().into_string().map_err(|e| {
                             anyhow!("OsString convertion failed: {:?}", e.to_string_lossy())
                         })?;
