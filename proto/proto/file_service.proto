@@ -5,6 +5,9 @@ service FileService {
   rpc DownloadFile(DownloadFileRequest) returns (stream DownloadFileResponse);
   rpc UploadFile(stream UploadFileRequest) returns (UploadFileResponse);
   rpc ListFiles(ListFilesRequest) returns (stream ListFilesResponse);
+  rpc DownloadFolder(DownloadFolderRequest) returns (stream DownloadFolderResponse);
+  rpc UploadFolder(UploadFolderRequest) returns (stream UploadFolderResponse);
+  rpc ListContent(ListContentRequest) returns (stream ListContentResponse);
 }
 
 message DownloadFileRequest {
@@ -31,4 +34,22 @@ message UploadFileRequest {
 }
 
 message UploadFileResponse {
+}
+
+message UploadFolderRequest {
+  oneof type {
+    string name = 1;
+    bytes chunk = 2;
+  }
+}
+
+message UploadFolderResponse {
+}
+
+message DownloadFolderRequest {
+  string name = 1;
+}
+
+message DownloadFolderResponse {
+  bytes chunk = 1;
 }
