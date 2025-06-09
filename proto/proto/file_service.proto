@@ -7,7 +7,6 @@ service FileService {
   rpc ListFiles(ListFilesRequest) returns (stream ListFilesResponse);
   rpc DownloadFolder(DownloadFolderRequest) returns (stream DownloadFolderResponse);
   rpc UploadFolder(UploadFolderRequest) returns (stream UploadFolderResponse);
-  rpc ListContent(ListContentRequest) returns (stream ListContentResponse);
 }
 
 message DownloadFileRequest {
