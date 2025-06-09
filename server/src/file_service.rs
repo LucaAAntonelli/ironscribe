@@ -1,10 +1,10 @@
 use anyhow::anyhow;
 use proto::api::file_service_server::FileService;
 use proto::api::{
-    upload_file_request, DownloadFileRequest, DownloadFileResponse, ListFilesRequest,
-    ListFilesResponse, UploadFileRequest, UploadFileResponse,
+    upload_file_request, DownloadFileRequest, DownloadFileResponse, DownloadFolderRequest, DownloadFolderResponse, ListFilesRequest, ListFilesResponse, UploadFileRequest, UploadFileResponse, UploadFolderRequest, UploadFolderResponse
 };
 use std::path::PathBuf;
+use std::sync::mpsc::Receiver;
 use std::sync::Arc;
 use tokio::fs;
 use tokio::io::{AsyncReadExt, AsyncWriteExt};
@@ -33,6 +33,7 @@ impl FileServiceImpl {
 #[tonic::async_trait]
 impl FileService for FileServiceImpl {
     type DownloadFileStream = ReceiverStream<Result<DownloadFileResponse, Status>>;
+    type DownloadFolderStream = ReceiverStream<Result<DownloadFolderResponse, Status>>;
     type ListFilesStream = ReceiverStream<Result<ListFilesResponse, Status>>;
 
     #[instrument(skip(self))]
@@ -100,6 +101,14 @@ impl FileService for FileServiceImpl {
     }
 
     #[instrument(skip(self))]
+    async fn download_folder(&self, request: Request<DownloadFolderRequest>) -> Result<Response<Self::DownloadFolderStream>, Status> {
+        let request = request.into_inner();
+        let (tx, rx) = mpsc::channel(Self::CHANNEL_SIZE);
+
+        Ok(Response::new(ReceiverStream::new(rx)))
+    }
+
+    #[instrument(skip(self))]
     async fn upload_file(
         &self,
         request: Request<Streaming<UploadFileRequest>>,
@@ -143,6 +152,12 @@ impl FileService for FileServiceImpl {
         } else {
             Ok(Response::new(UploadFileResponse::default()))
         }
+    }
+
+    #[instrument(skip(self))]
+    async fn upload_folder(&self, request: Request<UploadFolderRequest>) -> Result<Response<UploadFolderResponse>, Status> {
+
+        Ok(Response::new(UploadFolderResponse::default()))
     }
 
     #[instrument(skip(self))]

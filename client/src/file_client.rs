@@ -126,6 +126,12 @@ impl FileClient<Channel> {
     }
 
     #[instrument(skip(self))]
+    pub async fn download_folder(&mut self, file: String, directory: PathBuf) -> Result<()> {
+        
+        Ok(())
+    }
+
+    #[instrument(skip(self))]
     pub async fn upload_file(&mut self, file: String, directory: PathBuf) -> Result<()> {
         let (tx, rx) = mpsc::channel(Self::CHANNEL_SIZE);
 
@@ -186,6 +192,12 @@ impl FileClient<Channel> {
             error!(%err);
             Err(err)?;
         }
+
+        Ok(())
+    }
+
+    #[instrument(skip(self))]
+    pub async fn upload_folder(&mut self, file: String, directory: PathBuf) -> Result<()> {
 
         Ok(())
     }
