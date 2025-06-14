@@ -22,6 +22,8 @@
             pkgs.cargo
             pkgs.pkg-config
             pkgs.openssl
+            # pkgs.protoc-gen-tonic
+            pkgs.protobuf
           ];
           RUST_BACKTRACE = "1";
         };
