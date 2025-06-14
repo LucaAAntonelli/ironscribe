@@ -7,4 +7,8 @@ A server-client application for ebook syncing and management written in Rust
 - [ ] Create different components
     - [ ] Folder sync
     - [ ] Client/Web GUI
-    - [ ] 
+        - [ ] Add/Edit/Remove books
+        - [ ] SQL database
+        - [ ] Book metadata
+    - [ ] Analytics
+
