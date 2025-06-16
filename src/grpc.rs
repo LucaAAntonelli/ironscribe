@@ -1,6 +1,6 @@
 use tonic::{Request, Response, Status};
-use crate::shared::{BookStore, Book};
-use booksync::book_sync_server::{BookSync, BookSyncServer};
+use crate::shared::BookStore;
+use booksync::book_sync_server::BookSync;
 use booksync::{UploadBookRequest, UploadBookResponse, GetBookRequest, GetBookResponse};
 
 pub mod booksync {
