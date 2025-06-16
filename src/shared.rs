@@ -13,7 +13,7 @@ pub struct Book {
     pub content: Vec<u8>,
 }
 
-#[derive(Clone, Default)]
+#[derive(Clone, Default, Debug)]
 pub struct BookStore {
     inner: Arc<RwLock<HashMap<String, Book>>>,
 }
