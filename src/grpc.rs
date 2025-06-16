@@ -2,6 +2,7 @@ use tonic::{Request, Response, Status};
 use crate::shared::BookStore;
 use booksync::book_sync_server::BookSync;
 use booksync::{UploadBookRequest, UploadBookResponse, GetBookRequest, GetBookResponse};
+use std::sync::Arc;
 
 pub mod booksync {
     tonic::include_proto!("booksync");
@@ -9,7 +10,7 @@ pub mod booksync {
 
 #[derive(Debug)]
 pub struct MyBookSync {
-    pub store: BookStore,
+    pub store: Arc<BookStore>,
 }
 
 #[tonic::async_trait]
