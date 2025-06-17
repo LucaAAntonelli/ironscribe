@@ -3,7 +3,8 @@ use axum::{
     routing::{get, post},
     Json, Router,
 };
-use crate::shared::{Book, BookStore};
+use crate::shared::BookStore;
+use crate::grpc::booksync::Book;
 use std::sync::Arc;
 
 pub fn routes(store: Arc<BookStore>) -> Router {
