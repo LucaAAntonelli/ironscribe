@@ -1,17 +1,7 @@
-use serde::{Deserialize, Serialize};
 use std::collections::HashMap;
 use std::sync::Arc;
 use tokio::sync::RwLock;
-
-#[derive(Debug, Clone, Serialize, Deserialize)]
-pub struct Book {
-    pub id: String,
-    pub title: String,
-    pub author: String,
-    pub format: String,
-    #[serde(with = "serde_bytes")]
-    pub content: Vec<u8>,
-}
+use crate::grpc::booksync::Book;
 
 #[derive(Clone, Default, Debug)]
 pub struct BookStore {
