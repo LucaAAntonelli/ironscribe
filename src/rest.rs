@@ -28,6 +28,7 @@ async fn upload_book(
 async fn get_book(
     State(store): State<Arc<BookStore>>,
     Path(id): Path<String>
+    // TODO: Option<Json<Book>> doesn't implement IntoResponse trait -> Implement or change types
 ) -> Option<Json<Book>> {
     store.get(&id).await.map(Json)
 }
