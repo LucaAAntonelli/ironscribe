@@ -1,8 +1,7 @@
 use axum::{
     extract::{Path, State},
     routing::{get, post},
-    Json, Router, debug_handler
-};
+    Json, Router};
 use crate::shared::BookStore;
 use crate::grpc::booksync::Book;
 use std::sync::Arc;
@@ -10,7 +9,7 @@ use std::sync::Arc;
 #[axum::debug_handler]
 pub fn routes(store: Arc<BookStore>) -> Router {
     Router::new()
-        // .route("/upload", post(upload_book))
+        .route("/upload", post(upload_book))
         .route("/book/:id", get(get_book))
         .with_state(store.clone())
 }
