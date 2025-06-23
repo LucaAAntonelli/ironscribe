@@ -31,10 +31,3 @@ async fn get_book(
         None => StatusCode::NOT_FOUND.into_response()
     }
 }
-
-#[axum::debug_handler]
-pub async fn handler(
-    State(_state): State<Arc<BookStore>>,
-) {
-    println!("Getter!");
-}
