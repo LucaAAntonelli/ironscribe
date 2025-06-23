@@ -7,7 +7,7 @@ use std::sync::Arc;
 pub fn routes(store: Arc<BookStore>) -> Router {
     Router::new()
         .route("/upload", post(upload_book))
-        .route("/book/:id", get(get_book))
+        .route("/book/{id}", get(get_book))
         .with_state(store.clone())
 }
 
