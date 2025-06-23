@@ -6,7 +6,7 @@ Currently, books can be uploaded and downloaded via REST API:
 
 ## Upload
 Create a JSON file, e.g., `sample.json` with the following structure:
-```
+```json
 // sample.json
 {
     "id": "1",
@@ -34,8 +34,8 @@ curl.exe --request GET http://localhost:8080/book/1
 ```
 This returns the same JSON object as was used in the `POST` request.
 
-# Tasks
-- [ ] Look into a hybrid server that exposes gRPC and REST, as REST is better usable on the web
+# Goals
+- [x] Look into a hybrid server that exposes gRPC and REST, as REST is better usable on the web
 - [ ] Create different components
     - [ ] Folder sync
     - [ ] Client/Web GUI
