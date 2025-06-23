@@ -1,6 +1,6 @@
 fn main() -> Result<(), Box<dyn std::error::Error>> {
     let mut config = tonic_build::Config::new();
-    config.type_attribute("booksync.Book", "#[derive(serde::Deserialize)]");
+    config.type_attribute("booksync.Book", "#[derive(serde::Deserialize, serde::Serialize)]");
     tonic_build::configure()
         .build_client(true)
         .build_server(true)
