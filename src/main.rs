@@ -4,7 +4,7 @@ mod shared;
 
 use grpc::booksync::book_sync_server::BookSyncServer;
 use grpc::MyBookSync;
-use rest::{handler, routes};
+use rest::routes;
 use shared::BookStore;
 use std::net::SocketAddr;
 use std::sync::Arc;
@@ -25,7 +25,7 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
         .add_service(BookSyncServer::new(grpc_service))
         .serve(grpc_addr);
 
-    let rest_app = routes(store.clone());
+    let rest_app = routes(Arc::clone(&store));
     // let rest_app = axum::Router::new().route("/", axum::routing::get(handler)).with_state(store.clone());
     let rest_listener = tokio::net::TcpListener::bind(rest_addr).await.unwrap();
 
