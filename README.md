@@ -7,7 +7,6 @@ Currently, books can be uploaded and downloaded via REST API:
 ## Upload
 Create a JSON file, e.g., `sample.json` with the following structure:
 ```json
-// sample.json
 {
     "id": "1",
     "title": "Some Profound Title",
