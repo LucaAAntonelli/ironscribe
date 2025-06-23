@@ -25,7 +25,6 @@ async fn get_book(
     State(store): State<Arc<BookStore>>,
     Path(id): Path<String>
 ) -> impl IntoResponse {
-    //store.get(&id).await.map(Json)
     match store.get(&id).await {
         Some(book) => Json(book).into_response(),
         None => StatusCode::NOT_FOUND.into_response()
