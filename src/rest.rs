@@ -1,7 +1,5 @@
 use axum::{
-    extract::{Path, State},
-    routing::{get, post},
-    Json, Router};
+    extract::{Path, State}, http::StatusCode, response::IntoResponse, routing::{get, post}, Json, Router};
 use crate::shared::BookStore;
 use crate::grpc::booksync::Book;
 use std::sync::Arc;
@@ -27,10 +25,12 @@ async fn upload_book(
 async fn get_book(
     State(store): State<Arc<BookStore>>,
     Path(id): Path<String>
-    // TODO: Option<Json<Book>> doesn't implement IntoResponse trait -> Implement or change types
-    // Problem seems to be the Option part, Json<Book> seems to implement IntoResponse
-) -> Option<Json<Book>> {
-    store.get(&id).await.map(Json)
+) -> impl IntoResponse {
+    //store.get(&id).await.map(Json)
+    match store.get(&id).await {
+        Some(book) => Json(book).into_response(),
+        None => StatusCode::NOT_FOUND.into_response()
+    }
 }
 
 #[axum::debug_handler]
