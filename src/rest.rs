@@ -4,7 +4,6 @@ use crate::shared::BookStore;
 use crate::grpc::booksync::Book;
 use std::sync::Arc;
 
-#[axum::debug_handler]
 pub fn routes(store: Arc<BookStore>) -> Router {
     Router::new()
         .route("/upload", post(upload_book))
