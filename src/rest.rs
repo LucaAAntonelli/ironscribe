@@ -28,6 +28,7 @@ async fn get_book(
     State(store): State<Arc<BookStore>>,
     Path(id): Path<String>
     // TODO: Option<Json<Book>> doesn't implement IntoResponse trait -> Implement or change types
+    // Problem seems to be the Option part, Json<Book> seems to implement IntoResponse
 ) -> Option<Json<Book>> {
     store.get(&id).await.map(Json)
 }
