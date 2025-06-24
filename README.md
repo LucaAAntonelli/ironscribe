@@ -44,12 +44,13 @@ This returns the same JSON object as was used in the `POST` request.
     - [ ] Analytics
 
 # Current Tasks:
-- Expand functionality: So far, books can be uploaded and downloaded via REST, but only with simple `cURL` commands and with synthetic book data. 
+- Expand functionality: So far, books can be uploaded and downloaded via REST, but only with simple `cURL` commands and with synthetic book data.
     - Both currently don't really offer any methods to e.g, upload only works with hand-typed JSON data, download just returns a JSON object with the serialized file content
-    - Replace `BookStore` hashmap with proper SQL database for persistent 
+    - Replace `BookStore` hashmap with proper SQL database for persistent
         - Ideally make it easil switchable for quick debugging and working without access to the database
     - Look into how to properly let files be downloaded via `cURL`
     - Add a getter method for a list of all books
     - Work through exact data stored in the `Book` struct
         - E.g., in the future, multiple authors per book, metadata like number of pages, cover image file etc.
         - Think about how to store the data (one single struct, multiple structs with `Into` and `From` traits implemented for conversion, ...)
+- Implement upload and download via gRPC as seen [here](https://github.com/optimumood/grpc-file-transfer-rust)
