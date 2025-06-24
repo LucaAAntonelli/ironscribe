@@ -53,4 +53,5 @@ This returns the same JSON object as was used in the `POST` request.
     - Work through exact data stored in the `Book` struct
         - E.g., in the future, multiple authors per book, metadata like number of pages, cover image file etc.
         - Think about how to store the data (one single struct, multiple structs with `Into` and `From` traits implemented for conversion, ...)
+        - Split book information from EPUB files, similar to Calibre?
 - Implement upload and download via gRPC as seen [here](https://github.com/optimumood/grpc-file-transfer-rust)
