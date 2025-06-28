@@ -10,10 +10,26 @@ pub struct BookStore {
 
 impl BookStore {
     pub async fn insert(&self, book: Book) {
-        self.inner.write().await.insert(book.id.clone(), book);
+        self.inner
+            .write()
+            .await
+            .insert(book.id.clone(), book);
     }
 
     pub async fn get(&self, id: &str) -> Option<Book> {
-        self.inner.read().await.get(id).cloned()
+        self.inner
+            .read()
+            .await
+            .get(id)
+            .cloned()
+    }
+
+    pub async fn get_all(&self) -> Vec<Book> {
+        self.inner
+            .read()
+            .await
+            .values()
+            .cloned()
+            .collect::<Vec<Book>>()
     }
 }
