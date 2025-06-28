@@ -54,3 +54,8 @@ This returns the same JSON object as was used in the `POST` request.
         - Think about how to store the data (one single struct, multiple structs with `Into` and `From` traits implemented for conversion, ...)
         - Split book information from EPUB files, similar to Calibre?
 - Implement upload and download via gRPC as seen [here](https://github.com/optimumood/grpc-file-transfer-rust)
+
+# Current Plan for data
+Split the file data and metadata of all books. There will be at least two structs; one being the file itself (name, path, data as bytes etc) and one being the book metadata (title, authors, series, index, publication date, pages, ...). Metadata will be automatically extracted from a book's EPUB file and may be stored in a separate file similar to Calibre. 
+
+In order to use this approach, both REST and gRPC need to provide a service for upload and download relating to the first struct, and a service to interact with the metadata (e.g., to get book metadata so it can be displayed in a client). As such, the protobuf file needs to be adapted to offer both of those structs. 
