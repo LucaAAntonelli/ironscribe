@@ -1,7 +1,7 @@
 use std::collections::HashMap;
 use std::sync::Arc;
 use tokio::sync::RwLock;
-use crate::grpc::booksync::Book;
+use crate::grpc_server::booksync::Book;
 
 #[derive(Clone, Default, Debug)]
 pub struct BookStore {
