@@ -32,14 +32,12 @@ pub async fn client_main(args: &Cli) -> Result<()> {
     .await?;
 
     match &args.command {
-        List => &mut client.list_files().await?,
+        List => client.list_files().await?,
         Download { file, directory } => {
-            &mut client
-                .download_file(file.clone(), directory.clone())
-                .await?
-        }
+            client.download_file(file.clone(), directory.clone()).await?
+        },
         Upload { file, directory } => {
-            &mut client.upload_file(file.clone(), directory.clone()).await?
+            client.upload_file(file.clone(), directory.clone()).await?
         }
     };
 
