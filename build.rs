@@ -6,5 +6,6 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
         .build_server(true)
         .compile_protos_with_config(config, &["proto/booksync.proto"], &["proto"])
         .expect("Failed to compile proto files!");
+    tonic_build::compile_protos("proto/fileservice.proto")?;
     Ok(())
 }
