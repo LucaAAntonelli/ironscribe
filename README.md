@@ -55,6 +55,7 @@ This returns the same JSON object as was used in the `POST` request.
         - Split book information from EPUB files, similar to Calibre?
 - Implement upload and download via gRPC as seen [here](https://github.com/optimumood/grpc-file-transfer-rust)
 - Port sync functionality from [here](https://github.com/FZambia/dirsync)
+- Think more about what exactly is needed regarding file sync (e.g., renaming files is probably irrelevant)
 
 # Current Plan for data
 Split the file data and metadata of all books. There will be at least two structs; one being the file itself (name, path, data as bytes etc) and one being the book metadata (title, authors, series, index, publication date, pages, ...). Metadata will be automatically extracted from a book's EPUB file and may be stored in a separate file similar to Calibre. 
