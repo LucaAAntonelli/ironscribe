@@ -1,7 +1,7 @@
 use axum::{
     extract::{Path, State}, http::StatusCode, response::IntoResponse, routing::{get, post}, Json, Router};
 use crate::shared::BookStore;
-use crate::grpc_server::booksync::Book;
+use crate::grpc::booksync::Book;
 use std::sync::Arc;
 
 pub fn routes(store: Arc<BookStore>) -> Router {

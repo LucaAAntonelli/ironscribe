@@ -1,9 +1,9 @@
-mod grpc_server;
+mod grpc;
 mod rest;
 mod shared;
 
-use grpc_server::booksync::book_sync_server::BookSyncServer;
-use grpc_server::MyBookSync;
+use grpc::booksync::book_sync_server::BookSyncServer;
+use grpc::MyBookSync;
 use rest::routes;
 use shared::BookStore;
 use std::net::SocketAddr;
