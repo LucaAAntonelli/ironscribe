@@ -5,9 +5,11 @@ edition = "2024"
 
 [[bin]]
 name = "client"
+path = "src/client.rs"
 
 [[bin]]
 name = "server"
+path = "src/server.rs"
 
 [dependencies]
 tonic = { version = "0.10", features = ["transport"] }
