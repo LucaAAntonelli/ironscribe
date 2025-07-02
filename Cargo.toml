@@ -1,20 +1,14 @@
-[package]
-name = "ironscribe"
-version = "0.1.0"
-edition = "2024"
+[workspace]
+members = [
+    "shared",
+    "client",
+    "server",
+]
+resolver = "3"
 
-[[bin]]
-name = "client"
-path = "src/client.rs"
-
-[[bin]]
-name = "server"
-path = "src/server.rs"
-
-[dependencies]
-tonic = "0.13.1"
+[workspace.dependencies]
+tonic = {version="0.13.1"}
 prost = "0.13"
-tokio = { version = "1.0", features = ["macros", "rt-multi-thread"] }
-
-[build-dependencies]
 tonic-build = "0.13.1"
+tokio-stream = "0.1.11"
+tokio = { version = "1.23.1", features = ["rt-multi-thread"] }
