@@ -12,7 +12,7 @@ pub struct MyDirSync {}
 
 #[tonic::async_trait]
 impl DirSync for MyDirSync {
-    async fn sayff_hello(
+    async fn say_hello(
         &self,
         request: Request<HelloRequest>,
     ) -> Result<Response<HelloResponse>, Status> {
