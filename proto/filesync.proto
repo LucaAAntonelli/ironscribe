@@ -3,10 +3,19 @@ syntax = "proto3";
 package service;
 
 service DirSync {
-    rpc SyncStructure(SyncRequest) returns (SyncResponse) {}
-    rpc DiffStructure(DiffRequest) returns (DiffResponse) {}
-    rpc GetChecksum(ChecksumRequest) returns (ChecksumResponse) {}
-    rpc UploadBlocks(stream Block) returns (UploadResponse) {}
+    rpc SyncStructure(SyncRequest) returns (SyncResponse);
+    rpc DiffStructure(DiffRequest) returns (DiffResponse);
+    rpc GetChecksum(ChecksumRequest) returns (ChecksumResponse);
+    rpc UploadBlocks(stream Block) returns (UploadResponse);
+    rpc SayHello(HelloRequest) returns (HelloResponse);
+}
+
+message HelloRequest {
+    string name = 1;
+}
+
+message HelloResponse {
+    string message = 1;
 }
 
 message SyncRequest {
