@@ -12,8 +12,9 @@ name = "server"
 path = "src/server.rs"
 
 [dependencies]
-tonic = { version = "0.10", features = ["transport"] }
-prost = "0.12"
+tonic = "0.13.1"
+prost = "0.13"
+tokio = { version = "1.0", features = ["macros", "rt-multi-thread"] }
 
 [build-dependencies]
-tonic-build = "*"
+tonic-build = "0.13.1"
