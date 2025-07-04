@@ -16,7 +16,7 @@ impl MyDirSync {
             //
 
         // Unlock server mutex
-        // return false
+        return false;
 
     }
 }
