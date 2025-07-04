@@ -62,15 +62,17 @@ impl DirSync for MyDirSync {
         request: Request<SyncRequest>,
     ) -> Result<Response<SyncResponse>, Status> {
         // Create key-value pairs for all elements in SyncRequest.get_elements()
+        let mut path_map: HashMap<String, String> = HashMap::new();
 
         // Iterate over all elements
+        for element in request.into_inner().elements.iter() {
 
             // Get path out of element, sanitize path and join with server's absolute directory
             
             // Add path to key-value store
             
             // If element is a directory, create the directory 
-
+        }
         // Recursively walk over file tree from server's absolute directory (root is skipped!)
 
             // If file doesn't exist in key-value pairs, delete the file
