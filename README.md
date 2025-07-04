@@ -44,18 +44,12 @@ This returns the same JSON object as was used in the `POST` request.
     - [ ] Analytics
 
 # Current Tasks:
-- Expand functionality: So far, books can be uploaded and downloaded via REST, but only with simple `cURL` commands and with synthetic book data.
-    - Both currently don't really offer any methods to upload/download, e.g, upload only works with hand-typed JSON data, download just returns a JSON object with the serialized file content
-    - Replace `BookStore` hashmap with proper SQL database for persistent data storage
-        - Ideally make it easil switchable for quick debugging and working without access to the database
-    - Look into how to properly let files be downloaded via `cURL`
-    - Work through exact data stored in the `Book` struct
-        - E.g., in the future, multiple authors per book, metadata like number of pages, cover image file etc.
-        - Think about how to store the data (one single struct, multiple structs with `Into` and `From` traits implemented for conversion, ...)
-        - Split book information from EPUB files, similar to Calibre?
-- Implement upload and download via gRPC as seen [here](https://github.com/optimumood/grpc-file-transfer-rust)
 - Port sync functionality from [here](https://github.com/FZambia/dirsync)
-- Think more about what exactly is needed regarding file sync (e.g., renaming files is probably irrelevant)
+- Once done, look for possible improvements (more idiomatic Rust solutions, improvements based on use case of syncing shallow folder structures, ...)
+- Look into shortcommings of original repo, such as 
+    - not working on Windows file system
+    - only working from client to server, not bidirectionally
+    - only working with a single client (might be necessary for web access later)
 
 # Current Plan for data
 Split the file data and metadata of all books. There will be at least two structs; one being the file itself (name, path, data as bytes etc) and one being the book metadata (title, authors, series, index, publication date, pages, ...). Metadata will be automatically extracted from a book's EPUB file and may be stored in a separate file similar to Calibre. 
