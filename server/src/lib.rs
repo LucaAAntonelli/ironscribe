@@ -4,6 +4,23 @@ use shared::shared::{dir_sync_server::DirSync, Block, ChecksumRequest, ChecksumR
 #[derive(Debug, Default)]
 pub struct MyDirSync {}
 
+impl MyDirSync {
+    fn copy_existing(&self, abs_path: String, incoming_checksum: String) -> bool {
+        // Lock server mutex
+        
+        // Loop over map of path -> checksums
+            // If checksum doesn't match incoming, skipped
+
+            // If checksum matches incoming, force-copy from path to abs_path 
+            // return true
+            //
+
+        // Unlock server mutex
+        // return false
+
+    }
+}
+
 #[tonic::async_trait]
 impl DirSync for MyDirSync {
     
@@ -68,6 +85,9 @@ impl DirSync for MyDirSync {
         &self,
         request: Request<ChecksumRequest>,
     ) -> Result<Response<ChecksumResponse>, Status> {
+        // Get path from request and create checksum for it (joined with root path)
+
+
         todo!("IMPLEMENT get_checksum()!");
     }
 
