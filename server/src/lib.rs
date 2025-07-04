@@ -1,8 +1,12 @@
 use tonic::{Request, Response, Status, Streaming};
 use shared::shared::{dir_sync_server::DirSync, Block, ChecksumRequest, ChecksumResponse, DiffRequest, DiffResponse, HelloRequest, HelloResponse, SyncRequest, SyncResponse, UploadResponse};
+use std::{collections::HashMap, sync::RwLock};
 
 #[derive(Debug, Default)]
-pub struct MyDirSync {}
+pub struct MyDirSync {
+    path_to_checksum: RwLock<HashMap<String, String>>,
+    absolute_directory: String,
+}
 
 impl MyDirSync {
     fn copy_existing(&self, abs_path: String, incoming_checksum: String) -> bool {
@@ -18,6 +22,16 @@ impl MyDirSync {
         // Unlock server mutex
         return false;
 
+    }
+
+    fn update_checksum(&self, path: String, checksum: String)  {
+        let mut map = self.path_to_checksum.write().unwrap();
+        map.insert(path, checksum);
+    }
+
+    fn delete_checksum(&self, path: String) {
+        let mut map = self.path_to_checksum.write().unwrap();
+        map.remove(&path);
     }
 }
 
