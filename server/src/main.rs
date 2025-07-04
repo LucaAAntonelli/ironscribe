@@ -1,5 +1,5 @@
 use server::MyDirSync;
-use shared::shared::dir_sync_server::DirSyncServer;
+use shared::proto::dir_sync_server::DirSyncServer;
 use tonic::transport::Server;
 
 #[tokio::main]
