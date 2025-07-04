@@ -37,14 +37,11 @@ impl DirSync for MyDirSync {
         // Recursively walk over file tree from server's absolute directory (root is skipped!)
 
             // If file doesn't exist in key-value pairs, delete the file
-            //
+            
             // If file exists in key-value pairs but not in the directory, it was already deleted
             // => Remove from key-value pairs
-            //
+            
             // If an error occurred (permissions, busy file etc.), return with an error 
-            //
-            //
-
             
         // SUMMARY: Created a map of paths and checksums from elements in request. Then, recursively
         // walk the server's root directory and for every file/folder, if there is no entry in the
@@ -56,6 +53,14 @@ impl DirSync for MyDirSync {
         &self,
         request: Request<DiffRequest>,
     ) -> Result<Response<DiffResponse>, Status> {
+        // Iterate over all created elements from request, assemble path, create directory if it is
+        // a directory
+
+        // Iterate over all deleted elements from request, assemble path, remove directory if it is
+        // a directory
+
+        // SUMMARY: Create all directories from request.getCreated(), delete all directories from
+        // request.getDeleted()
         todo!("IMPLEMENT diff_structure()!");
     }
 
