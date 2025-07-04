@@ -57,7 +57,7 @@ impl DirSync for MyDirSync {
         // a directory
 
         // Iterate over all deleted elements from request, assemble path, remove directory if it is
-        // a directory
+        // a directory, delete checksum entry
 
         // SUMMARY: Create all directories from request.getCreated(), delete all directories from
         // request.getDeleted()
