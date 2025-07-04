@@ -24,6 +24,31 @@ impl DirSync for MyDirSync {
         &self,
         request: Request<SyncRequest>,
     ) -> Result<Response<SyncResponse>, Status> {
+        // Create key-value pairs for all elements in SyncRequest.get_elements()
+
+        // Iterate over all elements
+
+            // Get path out of element, sanitize path and join with server's absolute directory
+            
+            // Add path to key-value store
+            
+            // If element is a directory, create the directory 
+
+        // Recursively walk over file tree from server's absolute directory (root is skipped!)
+
+            // If file doesn't exist in key-value pairs, delete the file
+            //
+            // If file exists in key-value pairs but not in the directory, it was already deleted
+            // => Remove from key-value pairs
+            //
+            // If an error occurred (permissions, busy file etc.), return with an error 
+            //
+            //
+
+            
+        // SUMMARY: Created a map of paths and checksums from elements in request. Then, recursively
+        // walk the server's root directory and for every file/folder, if there is no entry in the
+        // map, remove it. If there is no file in the directory, remove the map entry
         todo!("IMPLEMENT sync_structure()!");
     }
 
