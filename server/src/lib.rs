@@ -1,7 +1,7 @@
 use tonic::{Request, Response, Status, Streaming};
 use shared::proto::{dir_sync_server::DirSync, Block, ChecksumRequest, ChecksumResponse, DiffRequest, DiffResponse, HelloRequest, HelloResponse, SyncRequest, SyncResponse, UploadResponse};
-use shared::filesystem::force_copy;
-use std::{collections::HashMap, sync::RwLock};
+use shared::filesystem::{force_copy, clean_path};
+use std::{collections::HashMap, sync::RwLock, path::Path};
 
 #[derive(Debug, Default)]
 pub struct MyDirSync {
@@ -39,6 +39,10 @@ impl MyDirSync {
         let mut map = self.path_to_checksum.write().unwrap();
         map.remove(&path);
     }
+
+    fn get_root_directory(&self) -> String {
+        self.absolute_directory
+    }
 }
 
 #[tonic::async_trait]
@@ -68,6 +72,7 @@ impl DirSync for MyDirSync {
         for element in request.into_inner().elements.iter() {
 
             // Get path out of element, sanitize path and join with server's absolute directory
+            let path = Path::new(self.get_root_directory()).join(Path::new(clean_path(element.path)));
             
             // Add path to key-value store
             
