@@ -1,7 +1,10 @@
+use shared::filesystem::{clean_path, force_copy};
+use shared::proto::{
+    Block, ChecksumRequest, ChecksumResponse, DiffRequest, DiffResponse, HelloRequest,
+    HelloResponse, SyncRequest, SyncResponse, UploadResponse, dir_sync_server::DirSync,
+};
+use std::{collections::HashMap, path::Path, sync::RwLock};
 use tonic::{Request, Response, Status, Streaming};
-use shared::proto::{dir_sync_server::DirSync, Block, ChecksumRequest, ChecksumResponse, DiffRequest, DiffResponse, HelloRequest, HelloResponse, SyncRequest, SyncResponse, UploadResponse};
-use shared::filesystem::{force_copy, clean_path};
-use std::{collections::HashMap, sync::RwLock, path::Path};
 
 #[derive(Debug, Default)]
 pub struct MyDirSync {
@@ -13,7 +16,7 @@ impl MyDirSync {
     fn copy_existing(&self, abs_path: String, incoming_checksum: String) -> bool {
         // Lock server mutex
         let map = self.path_to_checksum.read().unwrap();
-        
+
         // Loop over map of path -> checksums
         for (path, checksum) in map.iter() {
             if checksum == &incoming_checksum {
@@ -25,12 +28,11 @@ impl MyDirSync {
                 Ok(_) => true,
                 Err(_) => false,
             };
-            
         }
         return false;
     }
 
-    fn update_checksum(&self, path: String, checksum: String)  {
+    fn update_checksum(&self, path: String, checksum: String) {
         let mut map = self.path_to_checksum.write().unwrap();
         map.insert(path, checksum);
     }
@@ -41,13 +43,12 @@ impl MyDirSync {
     }
 
     fn get_root_directory(&self) -> String {
-        self.absolute_directory
+        self.absolute_directory.clone()
     }
 }
 
 #[tonic::async_trait]
 impl DirSync for MyDirSync {
-    
     async fn say_hello(
         &self,
         request: Request<HelloRequest>,
@@ -70,23 +71,23 @@ impl DirSync for MyDirSync {
 
         // Iterate over all elements
         for element in request.into_inner().elements.iter() {
-
             // Get path out of element, sanitize path and join with server's absolute directory
-            let path = Path::new(self.get_root_directory()).join(Path::new(clean_path(element.path)));
-            
+            let path =
+                Path::new(self.get_root_directory()).join(Path::new(clean_path(element.path)));
+
             // Add path to key-value store
-            
-            // If element is a directory, create the directory 
+
+            // If element is a directory, create the directory
         }
         // Recursively walk over file tree from server's absolute directory (root is skipped!)
 
-            // If file doesn't exist in key-value pairs, delete the file
-            
-            // If file exists in key-value pairs but not in the directory, it was already deleted
-            // => Remove from key-value pairs
-            
-            // If an error occurred (permissions, busy file etc.), return with an error 
-            
+        // If file doesn't exist in key-value pairs, delete the file
+
+        // If file exists in key-value pairs but not in the directory, it was already deleted
+        // => Remove from key-value pairs
+
+        // If an error occurred (permissions, busy file etc.), return with an error
+
         // SUMMARY: Created a map of paths and checksums from elements in request. Then, recursively
         // walk the server's root directory and for every file/folder, if there is no entry in the
         // map, remove it. If there is no file in the directory, remove the map entry
@@ -114,7 +115,6 @@ impl DirSync for MyDirSync {
     ) -> Result<Response<ChecksumResponse>, Status> {
         // Get path from request and create checksum for it (joined with root path)
 
-
         todo!("IMPLEMENT get_checksum()!");
     }
 
@@ -125,5 +125,3 @@ impl DirSync for MyDirSync {
         todo!("IMPLEMENT upload_blocks()!");
     }
 }
-
-
