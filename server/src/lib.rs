@@ -59,8 +59,8 @@ impl DirSync for MyDirSync {
         // Iterate over all elements
         for element in request.into_inner().elements.iter() {
             // Get path out of element, sanitize path and join with server's absolute directory
-            let path =
-                Path::new(self.get_root_directory()).join(Path::new(clean_path(element.path)));
+            let path = Path::new(&self.get_root_directory())
+                .join(Path::new(&clean_path(element.path.clone())));
 
             // Add path to key-value store
 
