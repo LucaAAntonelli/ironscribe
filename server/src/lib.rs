@@ -1,7 +1,7 @@
 use shared::filesystem::{clean_path, force_copy};
 use shared::proto::{
-    Block, ChecksumRequest, ChecksumResponse, DiffRequest, DiffResponse, HelloRequest,
-    HelloResponse, SyncRequest, SyncResponse, UploadResponse, dir_sync_server::DirSync,
+    Block, ChecksumRequest, ChecksumResponse, DiffRequest, DiffResponse, SyncRequest, SyncResponse,
+    UploadResponse, dir_sync_server::DirSync,
 };
 use std::{collections::HashMap, path::Path, sync::RwLock};
 use tonic::{Request, Response, Status, Streaming};
@@ -49,19 +49,6 @@ impl MyDirSync {
 
 #[tonic::async_trait]
 impl DirSync for MyDirSync {
-    async fn say_hello(
-        &self,
-        request: Request<HelloRequest>,
-    ) -> Result<Response<HelloResponse>, Status> {
-        println!("Got a request: {:?}", request);
-
-        let response = HelloResponse {
-            message: format!("Hello {}!", request.into_inner().name),
-        };
-
-        Ok(Response::new(response))
-    }
-
     async fn sync_structure(
         &self,
         request: Request<SyncRequest>,
