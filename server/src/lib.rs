@@ -1,19 +1,25 @@
-use shared::filesystem::{clean_path, force_copy};
+use shared::filesystem::{clean_path, force_copy, walk_filetree_and_apply};
 use shared::proto::{
     Block, ChecksumRequest, ChecksumResponse, DiffRequest, DiffResponse, SyncRequest, SyncResponse,
     UploadResponse, dir_sync_server::DirSync,
 };
-use std::{collections::HashMap, path::Path, sync::RwLock};
+use std::fs::create_dir_all;
+use std::path::PathBuf;
+use std::{
+    collections::{HashMap, HashSet},
+    path::Path,
+    sync::RwLock,
+};
 use tonic::{Request, Response, Status, Streaming};
 
-#[derive(Debug, Default)]
+#[derive(Debug)]
 pub struct MyDirSync {
-    path_to_checksum: RwLock<HashMap<String, String>>,
-    absolute_directory: String,
+    path_to_checksum: RwLock<HashMap<PathBuf, String>>,
+    absolute_directory: Path,
 }
 
 impl MyDirSync {
-    fn copy_existing(&self, abs_path: String, incoming_checksum: String) -> bool {
+    fn copy_existing(&self, abs_path: PathBuf, incoming_checksum: String) -> bool {
         // Lock server mutex
         let map = self.path_to_checksum.read().unwrap();
 
@@ -32,18 +38,18 @@ impl MyDirSync {
         return false;
     }
 
-    fn update_checksum(&self, path: String, checksum: String) {
+    fn update_checksum(&self, path: PathBuf, checksum: String) {
         let mut map = self.path_to_checksum.write().unwrap();
         map.insert(path, checksum);
     }
 
-    fn delete_checksum(&self, path: String) {
+    fn delete_checksum(&self, path: PathBuf) {
         let mut map = self.path_to_checksum.write().unwrap();
         map.remove(&path);
     }
 
-    fn get_root_directory(&self) -> String {
-        self.absolute_directory.clone()
+    fn get_root_directory(&self) -> &Path {
+        &self.absolute_directory
     }
 }
 
@@ -54,31 +60,40 @@ impl DirSync for MyDirSync {
         request: Request<SyncRequest>,
     ) -> Result<Response<SyncResponse>, Status> {
         // Create key-value pairs for all elements in SyncRequest.get_elements()
-        let mut path_map: HashMap<String, String> = HashMap::new();
+        let mut path_set: HashSet<PathBuf> = HashSet::new();
 
         // Iterate over all elements
         for element in request.into_inner().elements.iter() {
             // Get path out of element, sanitize path and join with server's absolute directory
-            let path = Path::new(&self.get_root_directory())
-                .join(Path::new(&clean_path(element.path.clone())));
-
-            // Add path to key-value store
+            let path = self
+                .get_root_directory()
+                .join(clean_path(element.path.clone()));
+            path_set.insert(path.clone());
 
             // If element is a directory, create the directory
+            if element.is_dir {
+                println!("Creating directory: {:?}", path);
+                create_dir_all(path)?;
+            }
         }
         // Recursively walk over file tree from server's absolute directory (root is skipped!)
+        walk_filetree_and_apply(self.get_root_directory(), &|entry| {
+            if entry.path().as_path() != self.get_root_directory()
+                && !path_set.contains(&entry.path())
+            {
+                // entry.path() not in client request -> delete on server
+                println!("Removing file: {:?}", entry.path());
+                if entry.path().is_dir() {
+                    std::fs::remove_dir_all(entry.path())?;
+                } else {
+                    std::fs::remove_file(entry.path())?;
+                }
+                self.delete_checksum(entry.path());
+            }
+            Ok(())
+        })?;
 
-        // If file doesn't exist in key-value pairs, delete the file
-
-        // If file exists in key-value pairs but not in the directory, it was already deleted
-        // => Remove from key-value pairs
-
-        // If an error occurred (permissions, busy file etc.), return with an error
-
-        // SUMMARY: Created a map of paths and checksums from elements in request. Then, recursively
-        // walk the server's root directory and for every file/folder, if there is no entry in the
-        // map, remove it. If there is no file in the directory, remove the map entry
-        todo!("IMPLEMENT sync_structure()!");
+        Ok(Response::new(SyncResponse {}))
     }
 
     async fn diff_structure(
