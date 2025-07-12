@@ -3,7 +3,7 @@ use shared::proto::{
     Block, ChecksumRequest, ChecksumResponse, DiffRequest, DiffResponse, SyncRequest, SyncResponse,
     UploadResponse, dir_sync_server::DirSync,
 };
-use std::fs::create_dir_all;
+use std::fs::{create_dir_all, remove_dir_all, remove_file};
 use std::path::PathBuf;
 use std::{
     collections::{HashMap, HashSet},
@@ -111,13 +111,27 @@ impl DirSync for MyDirSync {
     ) -> Result<Response<DiffResponse>, Status> {
         // Iterate over all created elements from request, assemble path, create directory if it is
         // a directory
+        let root_directory_path = self.get_root_directory();
+        let consumed_request = request.into_inner();
+        for element in consumed_request.created.iter() {
+            if element.is_dir {
+                let path = root_directory_path.join(clean_path(element.path.clone()));
+                create_dir_all(path)?;
+            }
+        }
 
         // Iterate over all deleted elements from request, assemble path, remove directory if it is
         // a directory, delete checksum entry
+        for element in consumed_request.deleted.iter() {
+            let path = root_directory_path.join(clean_path(element.path.clone()));
+            if element.is_dir {
+                remove_dir_all(path)?;
+            } else {
+                remove_file(path)?;
+            }
+        }
 
-        // SUMMARY: Create all directories from request.getCreated(), delete all directories from
-        // request.getDeleted()
-        todo!("IMPLEMENT diff_structure()!");
+        Ok(Response::new(DiffResponse {}))
     }
 
     async fn get_checksum(
