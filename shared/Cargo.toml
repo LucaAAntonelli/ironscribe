@@ -6,6 +6,7 @@ edition = "2024"
 [dependencies]
 tonic.workspace = true
 prost.workspace = true
+sha2 = "0.10.9"
 
 [build-dependencies]
 tonic-build.workspace = true

@@ -1,3 +1,4 @@
+use sha2::{Digest, Sha256};
 use std::{
     fs::{self, DirEntry, copy},
     io::Error,
@@ -28,4 +29,12 @@ where
         }
     }
     Ok(())
+}
+
+pub fn compute_sha256(path: PathBuf) -> String {
+    let hash = Sha256::digest(path.to_str().unwrap())
+        .iter()
+        .map(|x| x.to_owned())
+        .collect::<Vec<u8>>();
+    String::from_utf8(hash).unwrap()
 }
