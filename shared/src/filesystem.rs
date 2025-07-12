@@ -1,7 +1,7 @@
 use sha2::{Digest, Sha256};
 use std::{
-    fs::{self, DirEntry, copy},
-    io::Error,
+    fs::{self, DirEntry, File, copy},
+    io::{Error, prelude::*},
     path::{Path, PathBuf},
 };
 
@@ -31,10 +31,14 @@ where
     Ok(())
 }
 
-pub fn compute_sha256(path: PathBuf) -> String {
-    let hash = Sha256::digest(path.to_str().unwrap())
+pub fn compute_file_sha256(path: PathBuf) -> Result<String, anyhow::Error> {
+    let mut file = File::open(path)?;
+    let mut content = String::new();
+    file.read_to_string(&mut content)?;
+    let hash = Sha256::digest(content)
         .iter()
         .map(|x| x.to_owned())
         .collect::<Vec<u8>>();
-    String::from_utf8(hash).unwrap()
+    let result = String::from_utf8(hash)?;
+    Ok(result)
 }
