@@ -136,8 +136,22 @@ impl DirSync for MyDirSync {
         request: Request<ChecksumRequest>,
     ) -> Result<Response<ChecksumResponse>, Status> {
         // Get path from request and create checksum for it (joined with root path)
-        let request_path = self.absolute_directory.join(request.into_inner().path);
-        let file_hash = compute_file_sha256(request_path);
+        let checksum_request = request.into_inner();
+        let path = self.absolute_directory.join(checksum_request.path);
+        let checksum = checksum_request.checksum;
+        if let Ok(file_hash) = compute_file_sha256(path.clone()) {
+            // Most likely failed because file doesn't exist on server yet => See if a copy
+            // exists by searching for SHA256 hash
+            if self.copy_existing(path.clone(), checksum.clone()) {
+                println!("Copied file from path {:?}", path.clone());
+                self.update_checksum(path.clone(), checksum.clone());
+                return Ok(Response::new(ChecksumResponse {
+                    path: path.to_str().unwrap().to_owned(),
+                    checksum,
+                    checksums: vec![],
+                }));
+            }
+        }
 
         todo!("IMPLEMENT get_checksum()!");
     }
