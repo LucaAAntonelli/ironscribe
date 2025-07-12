@@ -15,7 +15,7 @@ use tonic::{Request, Response, Status, Streaming};
 #[derive(Debug)]
 pub struct MyDirSync {
     path_to_checksum: RwLock<HashMap<PathBuf, String>>,
-    absolute_directory: Path,
+    absolute_directory: PathBuf,
 }
 
 impl MyDirSync {
@@ -50,6 +50,15 @@ impl MyDirSync {
 
     fn get_root_directory(&self) -> &Path {
         &self.absolute_directory
+    }
+}
+
+impl Default for MyDirSync {
+    fn default() -> Self {
+        Self {
+            path_to_checksum: RwLock::new(HashMap::new()),
+            absolute_directory: PathBuf::new(),
+        }
     }
 }
 
