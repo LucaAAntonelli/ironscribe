@@ -1,4 +1,4 @@
-use shared::filesystem::{clean_path, force_copy, walk_filetree_and_apply};
+use shared::filesystem::{clean_path, compute_file_sha256, force_copy, walk_filetree_and_apply};
 use shared::proto::{
     Block, ChecksumRequest, ChecksumResponse, DiffRequest, DiffResponse, SyncRequest, SyncResponse,
     UploadResponse, dir_sync_server::DirSync,
@@ -139,6 +139,8 @@ impl DirSync for MyDirSync {
         request: Request<ChecksumRequest>,
     ) -> Result<Response<ChecksumResponse>, Status> {
         // Get path from request and create checksum for it (joined with root path)
+        let request_path = self.absolute_directory.join(request.into_inner().path);
+        let file_hash = compute_file_sha256(request_path);
 
         todo!("IMPLEMENT get_checksum()!");
     }
