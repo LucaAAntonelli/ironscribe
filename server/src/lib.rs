@@ -22,20 +22,17 @@ impl MyDirSync {
     fn copy_existing(&self, abs_path: PathBuf, incoming_checksum: String) -> bool {
         // Lock server mutex
         let map = self.path_to_checksum.read().unwrap();
-
-        // Loop over map of path -> checksums
-        for (path, checksum) in map.iter() {
-            if checksum == &incoming_checksum {
-                // If checksum doesn't match incoming, skipped
-                continue;
+        let matching_path = map.iter().find_map(|(key, value)| {
+            if value == &incoming_checksum {
+                Some(key)
+            } else {
+                None
             }
-            // If checksum matches incoming, force-copy from path to abs_path
-            match force_copy(path.to_owned(), abs_path.clone()) {
-                Ok(_) => true,
-                Err(_) => false,
-            };
+        });
+        match matching_path {
+            Some(path) => force_copy(abs_path, path.to_owned()).is_ok(),
+            None => false,
         }
-        return false;
     }
 
     fn update_checksum(&self, path: PathBuf, checksum: String) {
