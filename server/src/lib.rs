@@ -151,6 +151,11 @@ impl DirSync for MyDirSync {
                     checksums: vec![],
                 }));
             }
+            return Ok(Response::new(ChecksumResponse {
+                path: path.to_str().unwrap().to_owned(),
+                checksum: "".to_string(),
+                checksums: vec![],
+            }));
         }
 
         todo!("IMPLEMENT get_checksum()!");
