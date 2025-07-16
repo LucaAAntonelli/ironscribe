@@ -19,22 +19,6 @@ pub struct MyDirSync {
 }
 
 impl MyDirSync {
-    fn copy_existing(&self, abs_path: PathBuf, incoming_checksum: String) -> bool {
-        // Lock server mutex
-        let map = self.path_to_checksum.read().unwrap();
-        let matching_path = map.iter().find_map(|(key, value)| {
-            if value == &incoming_checksum {
-                Some(key)
-            } else {
-                None
-            }
-        });
-        match matching_path {
-            Some(path) => force_copy(abs_path, path.to_owned()).is_ok(),
-            None => false,
-        }
-    }
-
     fn update_checksum(&self, path: PathBuf, checksum: String) {
         let mut map = self.path_to_checksum.write().unwrap();
         map.insert(path, checksum);
@@ -47,6 +31,20 @@ impl MyDirSync {
 
     fn get_root_directory(&self) -> &Path {
         &self.absolute_directory
+    }
+
+    fn get_file_with_matching_checksum(&self, checksum: String) -> Option<PathBuf> {
+        self.path_to_checksum
+            .read()
+            .unwrap()
+            .iter()
+            .find_map(|(key, value)| {
+                if value == &checksum {
+                    Some(key.to_path_buf())
+                } else {
+                    None
+                }
+            })
     }
 }
 
@@ -139,23 +137,66 @@ impl DirSync for MyDirSync {
         let checksum_request = request.into_inner();
         let path = self.absolute_directory.join(checksum_request.path);
         let checksum = checksum_request.checksum;
-        if let Ok(file_hash) = compute_file_sha256(path.clone()) {
-            // Most likely failed because file doesn't exist on server yet => See if a copy
-            // exists by searching for SHA256 hash
-            if self.copy_existing(path.clone(), checksum.clone()) {
-                println!("Copied file from path {:?}", path.clone());
-                self.update_checksum(path.clone(), checksum.clone());
-                return Ok(Response::new(ChecksumResponse {
-                    path: path.to_str().unwrap().to_owned(),
-                    checksum,
-                    checksums: vec![],
-                }));
+        match compute_file_sha256(path.clone()) {
+            Ok(Some(filehash)) => {
+                // File exists and checksum was returned
+                if filehash == checksum {
+                    // Files match, nothing to do
+                    return Ok(Response::new(ChecksumResponse {
+                        path: path.to_string_lossy().into_owned(),
+                        checksum,
+                        checksums: vec![],
+                    }));
+                } else {
+                    // Difference, file changed, try to copy
+                    if let Some(found_path) = self.get_file_with_matching_checksum(checksum.clone())
+                    {
+                        match force_copy(found_path, path.clone()) {
+                            Ok(_) => {
+                                println!("Copied file from path {:?}", path.clone());
+                                self.update_checksum(path.clone(), checksum.clone());
+                                return Ok(Response::new(ChecksumResponse {
+                                    path: path.to_string_lossy().into_owned(),
+                                    checksum,
+                                    checksums: vec![],
+                                }));
+                            }
+                            Err(e) => {
+                                // Return status with error
+                                return Err(Status::aborted("Could not copy file"));
+                            }
+                        }
+                    } else {
+                        // no file with matching hash -> need client to stream blocks
+                    }
+                }
             }
-            return Ok(Response::new(ChecksumResponse {
-                path: path.to_str().unwrap().to_owned(),
-                checksum: "".to_string(),
-                checksums: vec![],
-            }));
+            Ok(None) => {
+                // File doesn't exist -> try to find copy
+                if let Some(found_path) = self.get_file_with_matching_checksum(checksum.clone()) {
+                    match force_copy(found_path, path.clone()) {
+                        Ok(_) => {
+                            println!("Copied file from path {:?}", path.clone());
+                            self.update_checksum(path.clone(), checksum.clone());
+                            return Ok(Response::new(ChecksumResponse {
+                                path: path.to_str().unwrap().to_owned(),
+                                checksum,
+                                checksums: vec![],
+                            }));
+                        }
+                        Err(e) => {
+                            // Return status with error
+                            return Err(Status::aborted("Could not copy file"));
+                        }
+                    }
+                } else {
+                    // no file with matching hash -> need client to stream blocks
+                }
+            }
+            Err(e) => {
+                // File exists, but could not be opened
+                return Err(Status::aborted("Could not open file"));
+            }
         }
 
         todo!("IMPLEMENT get_checksum()!");

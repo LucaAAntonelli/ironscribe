@@ -32,15 +32,19 @@ where
     Ok(())
 }
 
-pub fn compute_file_sha256(path: PathBuf) -> Result<String, anyhow::Error> {
-    let mut file = File::open(path).context("Failed to open file")?;
-    let mut content = String::new();
-    file.read_to_string(&mut content)
-        .context("Failed to read file content into string")?;
-    let hash = Sha256::digest(content)
-        .iter()
-        .map(|x| x.to_owned())
-        .collect::<Vec<u8>>();
-    let result = String::from_utf8(hash).context("Failed to build string from UTF-8 hash")?;
-    Ok(result)
+pub fn compute_file_sha256(path: PathBuf) -> Result<Option<String>, anyhow::Error> {
+    if Path::exists(path.as_path()) {
+        let mut file = File::open(path).context("Failed to open file")?;
+        let mut content = String::new();
+        file.read_to_string(&mut content)
+            .context("Failed to read file content into string")?;
+        let hash = Sha256::digest(content)
+            .iter()
+            .map(|x| x.to_owned())
+            .collect::<Vec<u8>>();
+        let result = String::from_utf8(hash).context("Failed to build string from UTF-8 hash")?;
+        Ok(Some(result))
+    } else {
+        Ok(None)
+    }
 }
