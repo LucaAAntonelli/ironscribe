@@ -48,3 +48,11 @@ pub fn compute_file_sha256(path: PathBuf) -> Result<Option<String>, anyhow::Erro
         Ok(None)
     }
 }
+
+// FileChunker turns file into chunks to compute the checksums per block
+// If two files differ, try to sync only differing blocks
+pub struct FileChunker {
+    path: PathBuf,
+    block_size: i64,
+    file: std::fs::File,
+}
