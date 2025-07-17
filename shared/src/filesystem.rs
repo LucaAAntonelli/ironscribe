@@ -1,4 +1,4 @@
-use anyhow::Context;
+use anyhow::{Context, anyhow};
 use sha2::{Digest, Sha256};
 use std::{
     fs::{self, DirEntry, File, copy},
@@ -53,6 +53,20 @@ pub fn compute_file_sha256(path: PathBuf) -> Result<Option<String>, anyhow::Erro
 // If two files differ, try to sync only differing blocks
 pub struct FileChunker {
     path: PathBuf,
-    block_size: i64,
+    block_size: u32,
     file: std::fs::File,
+}
+
+impl FileChunker {
+    pub fn new(&self, path: PathBuf, block_size: u32) -> Result<Self, anyhow::Error> {
+        if block_size == 0 {
+            return Err(anyhow!("Block size cannot be zero!"));
+        }
+        let file = File::open(path.clone()).context("Failed to open file")?;
+        Ok(Self {
+            path,
+            block_size,
+            file,
+        })
+    }
 }
