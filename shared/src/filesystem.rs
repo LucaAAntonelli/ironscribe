@@ -53,7 +53,7 @@ pub fn compute_file_sha256(path: PathBuf) -> Result<Option<String>, anyhow::Erro
 // If two files differ, try to sync only differing blocks
 pub struct FileChunker {
     path: PathBuf,
-    block_size: u32,
+    block_size: usize,
     file: std::fs::File,
 }
 
@@ -73,5 +73,8 @@ impl FileChunker {
 
 impl Iterator for FileChunker {
     type Item = Vec<u8>;
-    fn next(&mut self) -> Option<Self::Item> {}
+    fn next(&mut self) -> Option<Self::Item> {
+        let mut buffer = vec![0u8; self.block_size];
+        Some(vec![])
+    }
 }
