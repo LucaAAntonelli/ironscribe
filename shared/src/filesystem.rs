@@ -2,7 +2,7 @@ use anyhow::{Context, anyhow};
 use sha2::{Digest, Sha256};
 use std::{
     fs::{self, DirEntry, File, copy},
-    io::{Error, prelude::*},
+    io::{self, Error, Read, prelude::*},
     path::{Path, PathBuf},
 };
 
@@ -58,7 +58,7 @@ pub struct FileChunker {
 }
 
 impl FileChunker {
-    pub fn new(&self, path: PathBuf, block_size: u32) -> Result<Self, anyhow::Error> {
+    pub fn new(&self, path: PathBuf, block_size: usize) -> Result<Self, anyhow::Error> {
         if block_size == 0 {
             return Err(anyhow!("Block size cannot be zero!"));
         }
@@ -75,6 +75,9 @@ impl Iterator for FileChunker {
     type Item = Vec<u8>;
     fn next(&mut self) -> Option<Self::Item> {
         let mut buffer = vec![0u8; self.block_size];
-        Some(vec![])
+        match self.file.read_exact(&mut buffer) {
+            Ok(()) => Some(buffer),
+            Err(_) => None,
+        }
     }
 }
