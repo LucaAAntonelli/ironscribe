@@ -70,3 +70,8 @@ impl FileChunker {
         })
     }
 }
+
+impl Iterator for FileChunker {
+    type Item = Vec<u8>;
+    fn next(&mut self) -> Option<Self::Item> {}
+}
