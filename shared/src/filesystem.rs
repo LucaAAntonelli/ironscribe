@@ -58,7 +58,7 @@ pub struct FileChunker {
 }
 
 impl FileChunker {
-    pub fn new(&self, path: PathBuf, block_size: usize) -> Result<Self, anyhow::Error> {
+    pub fn new(path: PathBuf, block_size: usize) -> Result<Self, anyhow::Error> {
         if block_size == 0 {
             return Err(anyhow!("Block size cannot be zero!"));
         }
@@ -75,9 +75,36 @@ impl Iterator for FileChunker {
     type Item = Vec<u8>;
     fn next(&mut self) -> Option<Self::Item> {
         let mut buffer = vec![0u8; self.block_size];
-        match self.file.read_exact(&mut buffer) {
-            Ok(()) => Some(buffer),
-            Err(_) => None,
+        match self.file.read(&mut buffer) {
+            Ok(0) => None, // EOF,
+            Ok(n) => {
+                buffer.truncate(n);
+                Some(buffer)
+            }
+            Err(e) => None,
         }
+    }
+}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+    #[test]
+    fn test_iterator() {
+        // Create a file with serial content
+        let write_buffer = "Hello, world!".as_bytes();
+        let test_file_path = "sample.txt";
+        let mut f = File::create(test_file_path).unwrap();
+        f.write_all(write_buffer).unwrap();
+
+        // Read content
+        let chunker = FileChunker::new(PathBuf::from(test_file_path), 2).unwrap();
+        let read_buffer = chunker.flatten().collect::<Vec<u8>>();
+
+        // Check that written and read buffers match
+        assert_eq!(write_buffer, read_buffer);
+
+        // Clean up file
+        std::fs::remove_file(test_file_path).unwrap();
     }
 }
