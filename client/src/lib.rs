@@ -1,3 +1,1 @@
-use shared::shared::dir_sync_client::DirSyncClient;
-use shared::shared::HelloRequest;
-
+use shared::proto::dir_sync_client::DirSyncClient;
