@@ -1,4 +1,6 @@
-use shared::filesystem::{clean_path, compute_file_sha256, force_copy, walk_filetree_and_apply};
+use shared::filesystem::{
+    FileChunker, clean_path, compute_file_sha256, force_copy, walk_filetree_and_apply,
+};
 use shared::proto::{
     Block, ChecksumRequest, ChecksumResponse, DiffRequest, DiffResponse, SyncRequest, SyncResponse,
     UploadResponse, dir_sync_server::DirSync,
@@ -136,6 +138,7 @@ impl DirSync for MyDirSync {
         // Get path from request and create checksum for it (joined with root path)
         let checksum_request = request.into_inner();
         let path = self.absolute_directory.join(checksum_request.path);
+        let block_size = checksum_request.block_size;
         let checksum = checksum_request.checksum;
         match compute_file_sha256(path.clone()) {
             Ok(Some(filehash)) => {
@@ -198,6 +201,7 @@ impl DirSync for MyDirSync {
                 return Err(Status::aborted("Could not open file"));
             }
         }
+        let file_chunker = FileChunker::new(path, block_size as usize);
 
         todo!("IMPLEMENT get_checksum()!");
     }
