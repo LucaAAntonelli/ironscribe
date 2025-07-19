@@ -49,6 +49,14 @@ pub fn compute_file_sha256(path: PathBuf) -> Result<Option<String>, anyhow::Erro
     }
 }
 
+pub fn compute_bytes_sha256(bytes: Vec<u8>) -> String {
+    let hash = Sha256::digest(bytes)
+        .iter()
+        .map(|x| x.to_owned())
+        .collect::<Vec<u8>>();
+    String::from_utf8(hash).unwrap()
+}
+
 // FileChunker turns file into chunks to compute the checksums per block
 // If two files differ, try to sync only differing blocks
 pub struct FileChunker {
