@@ -1,8 +1,9 @@
+use adler32::RollingAdler32;
 use anyhow::{Context, anyhow};
 use sha2::{Digest, Sha256};
 use std::{
     fs::{self, DirEntry, File, copy},
-    io::{self, Error, Read, prelude::*},
+    io::{Error, Read},
     path::{Path, PathBuf},
 };
 
@@ -32,29 +33,34 @@ where
     Ok(())
 }
 
-pub fn compute_file_sha256(path: PathBuf) -> Result<Option<String>, anyhow::Error> {
-    if Path::exists(path.as_path()) {
-        let mut file = File::open(path).context("Failed to open file")?;
-        let mut content = String::new();
-        file.read_to_string(&mut content)
-            .context("Failed to read file content into string")?;
-        let hash = Sha256::digest(content)
-            .iter()
-            .map(|x| x.to_owned())
-            .collect::<Vec<u8>>();
-        let result = String::from_utf8(hash).context("Failed to build string from UTF-8 hash")?;
-        Ok(Some(result))
-    } else {
-        Ok(None)
-    }
-}
+pub struct Hasher {}
 
-pub fn compute_bytes_sha256(bytes: Vec<u8>) -> String {
-    let hash = Sha256::digest(bytes)
-        .iter()
-        .map(|x| x.to_owned())
-        .collect::<Vec<u8>>();
-    String::from_utf8(hash).unwrap()
+impl Hasher {
+    pub fn compute_file_hash(&self, path: PathBuf) -> Result<Option<[u8; 32]>, anyhow::Error> {
+        // One-shot hash, i.e. compute hash and consume directly
+        if Path::exists(path.as_path()) {
+            let mut file = File::open(path).context("Failed to open file")?;
+            let mut content = String::new();
+            file.read_to_string(&mut content)
+                .context("Failed to read file content into string")?;
+            let result = Sha256::digest(content).into();
+            Ok(Some(result))
+        } else {
+            Ok(None)
+        }
+    }
+
+    pub fn compute_weak_byte_hash(&self, bytes: &Vec<u8>) -> u32 {
+        let mut adler32 = RollingAdler32::new();
+        adler32.update_buffer(bytes);
+        adler32.hash()
+    }
+
+    pub fn compute_strong_byte_hash(&self, bytes: &Vec<u8>) -> [u8; 32] {
+        let mut sha256 = Sha256::new();
+        sha256.update(bytes);
+        sha256.finalize().into()
+    }
 }
 
 // FileChunker turns file into chunks to compute the checksums per block
@@ -97,6 +103,7 @@ impl Iterator for FileChunker {
 #[cfg(test)]
 mod tests {
     use super::*;
+    use std::io::Write;
     #[test]
     fn test_iterator() {
         // Create a file with serial content
