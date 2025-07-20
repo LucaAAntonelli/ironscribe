@@ -6,7 +6,7 @@ use shared::proto::{
     Block, ChecksumRequest, ChecksumResponse, DiffRequest, DiffResponse, SyncRequest, SyncResponse,
     UploadResponse, dir_sync_server::DirSync,
 };
-use std::fs::{Metadata, create_dir_all, remove_dir_all, remove_file};
+use std::fs::{create_dir_all, remove_dir_all, remove_file};
 use std::path::PathBuf;
 use std::{
     collections::{HashMap, HashSet},
