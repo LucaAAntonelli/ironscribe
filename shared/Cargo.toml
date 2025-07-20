@@ -8,6 +8,7 @@ tonic.workspace = true
 prost.workspace = true
 sha2 = "0.10.9"
 anyhow = "1.0.98"
+adler32 = "1.2.0"
 
 [build-dependencies]
 tonic-build.workspace = true
