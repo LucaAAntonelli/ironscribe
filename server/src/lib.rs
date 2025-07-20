@@ -1,10 +1,12 @@
+use anyhow::bail;
+use shared::errors::MetadataError;
 use shared::filesystem::{FileChunker, Hasher, clean_path, force_copy, walk_filetree_and_apply};
 use shared::proto::Checksum;
 use shared::proto::{
     Block, ChecksumRequest, ChecksumResponse, DiffRequest, DiffResponse, SyncRequest, SyncResponse,
     UploadResponse, dir_sync_server::DirSync,
 };
-use std::fs::{create_dir_all, remove_dir_all, remove_file};
+use std::fs::{Metadata, create_dir_all, remove_dir_all, remove_file};
 use std::path::PathBuf;
 use std::{
     collections::{HashMap, HashSet},
@@ -12,6 +14,34 @@ use std::{
     sync::RwLock,
 };
 use tonic::{Request, Response, Status, Streaming};
+
+struct UploadStreamMetadata {
+    path: String,
+    block_size: usize,
+}
+
+fn extract_metadata_from_map(
+    metadata_map: tonic::metadata::MetadataMap,
+) -> Result<UploadStreamMetadata, anyhow::Error> {
+    let path = match metadata_map.get("path") {
+        None => bail!(MetadataError::KeyNotFoundError("path")),
+        Some(val) if val.is_empty() => bail!(MetadataError::EmptyValueError("path")),
+        Some(val) if val.len() != 1 => bail!(MetadataError::InvalidLengthError("path")),
+        Some(val) => val.to_str()?.to_owned(),
+    };
+    let block_size = match metadata_map.get("block_size") {
+        None => bail!(MetadataError::KeyNotFoundError("block_size")),
+        Some(val) if val.is_empty() => {
+            bail!(MetadataError::EmptyValueError("block_size"))
+        }
+        Some(val) if val.len() != 1 => {
+            bail!(MetadataError::InvalidLengthError("block_size"))
+        }
+        Some(val) => val.to_str()?.parse()?,
+    };
+
+    Ok(UploadStreamMetadata { path, block_size })
+}
 
 #[derive(Debug)]
 pub struct MyDirSync {
@@ -238,6 +268,11 @@ impl DirSync for MyDirSync {
         &self,
         request: Request<Streaming<Block>>,
     ) -> Result<Response<UploadResponse>, Status> {
+        let metadata = request.metadata();
+        let path = metadata.get("path").unwrap();
+        let block_size = metadata.get("block_size").unwrap();
+        let incoming_request = request.into_inner();
+
         todo!("IMPLEMENT upload_blocks()!");
     }
 }
