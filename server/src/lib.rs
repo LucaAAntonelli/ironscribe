@@ -21,7 +21,7 @@ struct UploadStreamMetadata {
 }
 
 fn extract_metadata_from_map(
-    metadata_map: tonic::metadata::MetadataMap,
+    metadata_map: &tonic::metadata::MetadataMap,
 ) -> Result<UploadStreamMetadata, anyhow::Error> {
     let path = match metadata_map.get("path") {
         None => bail!(MetadataError::KeyNotFoundError("path")),
@@ -268,9 +268,14 @@ impl DirSync for MyDirSync {
         &self,
         request: Request<Streaming<Block>>,
     ) -> Result<Response<UploadResponse>, Status> {
-        let metadata = request.metadata();
-        let path = metadata.get("path").unwrap();
-        let block_size = metadata.get("block_size").unwrap();
+        let metadata_map = request.metadata();
+        let metadata = match extract_metadata_from_map(metadata_map) {
+            Ok(x) => x,
+            Err(e) => {
+                return Err(Status::failed_precondition("Metadata invalid"));
+            }
+        };
+
         let incoming_request = request.into_inner();
 
         todo!("IMPLEMENT upload_blocks()!");
