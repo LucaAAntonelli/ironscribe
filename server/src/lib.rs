@@ -1,6 +1,5 @@
-use shared::filesystem::{
-    FileChunker, clean_path, compute_file_sha256, force_copy, walk_filetree_and_apply,
-};
+use shared::filesystem::{FileChunker, Hasher, clean_path, force_copy, walk_filetree_and_apply};
+use shared::proto::Checksum;
 use shared::proto::{
     Block, ChecksumRequest, ChecksumResponse, DiffRequest, DiffResponse, SyncRequest, SyncResponse,
     UploadResponse, dir_sync_server::DirSync,
@@ -16,12 +15,12 @@ use tonic::{Request, Response, Status, Streaming};
 
 #[derive(Debug)]
 pub struct MyDirSync {
-    path_to_checksum: RwLock<HashMap<PathBuf, String>>,
+    path_to_checksum: RwLock<HashMap<PathBuf, [u8; 32]>>,
     absolute_directory: PathBuf,
 }
 
 impl MyDirSync {
-    fn update_checksum(&self, path: PathBuf, checksum: String) {
+    fn update_checksum(&self, path: PathBuf, checksum: [u8; 32]) {
         let mut map = self.path_to_checksum.write().unwrap();
         map.insert(path, checksum);
     }
@@ -35,13 +34,13 @@ impl MyDirSync {
         &self.absolute_directory
     }
 
-    fn get_file_with_matching_checksum(&self, checksum: String) -> Option<PathBuf> {
+    fn get_file_with_matching_checksum(&self, checksum: [u8; 32]) -> Option<PathBuf> {
         self.path_to_checksum
             .read()
             .unwrap()
             .iter()
             .find_map(|(key, value)| {
-                if value == &checksum {
+                if value[..] == checksum[..] {
                     Some(key.to_path_buf())
                 } else {
                     None
@@ -140,10 +139,13 @@ impl DirSync for MyDirSync {
         let path = self.absolute_directory.join(checksum_request.path);
         let block_size = checksum_request.block_size;
         let checksum = checksum_request.checksum;
-        match compute_file_sha256(path.clone()) {
+
+        let hasher = Hasher {};
+
+        match hasher.compute_file_hash(path.clone()) {
             Ok(Some(filehash)) => {
                 // File exists and checksum was returned
-                if filehash == checksum {
+                if filehash[..] == checksum[..] {
                     // Files match, nothing to do
                     return Ok(Response::new(ChecksumResponse {
                         path: path.to_string_lossy().into_owned(),
@@ -152,12 +154,16 @@ impl DirSync for MyDirSync {
                     }));
                 } else {
                     // Difference, file changed, try to copy
-                    if let Some(found_path) = self.get_file_with_matching_checksum(checksum.clone())
+                    if let Some(found_path) =
+                        self.get_file_with_matching_checksum(checksum.clone().try_into().unwrap())
                     {
                         match force_copy(found_path, path.clone()) {
                             Ok(_) => {
                                 println!("Copied file from path {:?}", path.clone());
-                                self.update_checksum(path.clone(), checksum.clone());
+                                self.update_checksum(
+                                    path.clone(),
+                                    checksum.clone().try_into().unwrap(),
+                                );
                                 return Ok(Response::new(ChecksumResponse {
                                     path: path.to_string_lossy().into_owned(),
                                     checksum,
@@ -176,14 +182,19 @@ impl DirSync for MyDirSync {
             }
             Ok(None) => {
                 // File doesn't exist -> try to find copy
-                if let Some(found_path) = self.get_file_with_matching_checksum(checksum.clone()) {
+                if let Some(found_path) =
+                    self.get_file_with_matching_checksum(checksum.clone().try_into().unwrap())
+                {
                     match force_copy(found_path, path.clone()) {
                         Ok(_) => {
                             println!("Copied file from path {:?}", path.clone());
-                            self.update_checksum(path.clone(), checksum.clone());
+                            self.update_checksum(
+                                path.clone(),
+                                checksum.clone().try_into().unwrap(),
+                            );
                             return Ok(Response::new(ChecksumResponse {
-                                path: path.to_str().unwrap().to_owned(),
-                                checksum,
+                                path: path.clone().to_str().unwrap().to_owned(),
+                                checksum: checksum.clone(),
                                 checksums: vec![],
                             }));
                         }
@@ -201,9 +212,26 @@ impl DirSync for MyDirSync {
                 return Err(Status::aborted("Could not open file"));
             }
         }
-        let file_chunker = FileChunker::new(path, block_size as usize);
+        let file_chunker = FileChunker::new(path.clone(), block_size as usize).unwrap();
 
-        todo!("IMPLEMENT get_checksum()!");
+        let mut checksums: Vec<Checksum> = vec![];
+
+        for bytes in file_chunker {
+            // bytes is a collection of bytes, corresponding to a chunk of the file
+            let strong = hasher.compute_strong_byte_hash(&bytes);
+            let weak = hasher.compute_weak_byte_hash(&bytes);
+
+            checksums.push(Checksum {
+                strong: strong.into(),
+                weak,
+            });
+        }
+
+        Ok(Response::new(ChecksumResponse {
+            path: path.to_str().unwrap().to_owned(),
+            checksum,
+            checksums,
+        }))
     }
 
     async fn upload_blocks(
