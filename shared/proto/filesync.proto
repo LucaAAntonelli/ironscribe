@@ -34,19 +34,19 @@ message DiffResponse {
 
 message ChecksumRequest {
     string path = 1;
-    string checksum = 2;
+    bytes checksum = 2;
     uint32 block_size = 3;
 }
 
 message ChecksumResponse {
     string path = 1;
-    string checksum = 2;
+    bytes checksum = 2;
     repeated Checksum checksums = 3;
 }
 
 message Checksum {
     uint32 weak = 1;
-    string strong = 2;
+    bytes strong = 2;
 }
 
 message UploadResponse {
