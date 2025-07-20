@@ -23,22 +23,31 @@ struct UploadStreamMetadata {
 fn extract_metadata_from_map(
     metadata_map: &tonic::metadata::MetadataMap,
 ) -> Result<UploadStreamMetadata, anyhow::Error> {
-    let path = match metadata_map.get("path") {
-        None => bail!(MetadataError::KeyNotFoundError("path")),
-        Some(val) if val.is_empty() => bail!(MetadataError::EmptyValueError("path")),
-        Some(val) if val.len() != 1 => bail!(MetadataError::InvalidLengthError("path")),
-        Some(val) => val.to_str()?.to_owned(),
-    };
-    let block_size = match metadata_map.get("block_size") {
-        None => bail!(MetadataError::KeyNotFoundError("block_size")),
-        Some(val) if val.is_empty() => {
-            bail!(MetadataError::EmptyValueError("block_size"))
-        }
-        Some(val) if val.len() != 1 => {
-            bail!(MetadataError::InvalidLengthError("block_size"))
-        }
-        Some(val) => val.to_str()?.parse()?,
-    };
+    let paths = metadata_map.get_all("path").iter().collect::<Vec<_>>();
+    if paths.is_empty() {
+        bail!(MetadataError::KeyNotFoundError("path"))
+    } else if paths.len() > 1 {
+        bail!(MetadataError::InvalidLengthError("path"))
+    }
+    let path = paths[0].to_str()?.to_owned();
+    if path.is_empty() {
+        bail!(MetadataError::EmptyValueError("path"))
+    }
+
+    let block_sizes = metadata_map
+        .get_all("block_size")
+        .iter()
+        .collect::<Vec<_>>();
+    if block_sizes.is_empty() {
+        bail!(MetadataError::KeyNotFoundError("block_size"))
+    } else if block_sizes.len() > 1 {
+        bail!(MetadataError::InvalidLengthError("block_size"))
+    }
+    let block_size = block_sizes[0].to_str()?;
+    if block_size.is_empty() {
+        bail!(MetadataError::EmptyValueError("path"))
+    }
+    let block_size = block_size.parse()?;
 
     Ok(UploadStreamMetadata { path, block_size })
 }
@@ -279,5 +288,28 @@ impl DirSync for MyDirSync {
         let incoming_request = request.into_inner();
 
         todo!("IMPLEMENT upload_blocks()!");
+    }
+}
+
+#[cfg(test)]
+mod tests {
+    use tonic::metadata::{AsciiMetadataKey, AsciiMetadataValue, MetadataMap};
+
+    use super::*;
+    #[test]
+    fn test_metadata_extraction() {
+        let mut dummy_map = MetadataMap::new();
+        dummy_map.insert(
+            AsciiMetadataKey::from_static("path"),
+            AsciiMetadataValue::from_static("/foo/bar"),
+        );
+        dummy_map.insert(
+            AsciiMetadataKey::from_static("block_size"),
+            AsciiMetadataValue::from_static("9"),
+        );
+
+        let extracted_metadata = extract_metadata_from_map(&dummy_map).unwrap();
+        assert_eq!(extracted_metadata.path, "/foo/bar");
+        assert_eq!(extracted_metadata.block_size, 9);
     }
 }
