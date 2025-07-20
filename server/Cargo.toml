@@ -7,3 +7,4 @@ edition = "2024"
 tokio.workspace = true
 shared = { path = "../shared"}
 tonic.workspace = true
+anyhow = "1.0.98"
