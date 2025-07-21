@@ -310,12 +310,7 @@ impl DirSync for MyDirSync {
     ) -> Result<Response<UploadResponse>, Status> {
         let metadata_map = request.metadata();
         extract_metadata_from_map(metadata_map)?;
-        let metadata = match extract_metadata_from_map(metadata_map) {
-            Ok(x) => x,
-            Err(e) => {
-                return Err(Status::failed_precondition("Metadata invalid"));
-            }
-        };
+        let metadata = extract_metadata_from_map(metadata_map)?;
 
         let incoming_request = request.into_inner();
         let path = metadata.path;
