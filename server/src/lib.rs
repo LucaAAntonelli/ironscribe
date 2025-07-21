@@ -46,7 +46,7 @@ fn extract_metadata_from_map(
     }
     let block_size = block_sizes[0].to_str()?;
     if block_size.is_empty() {
-        bail!(MetadataError::EmptyValueError("path"))
+        bail!(MetadataError::EmptyValueError("block_size"))
     }
     let block_size = block_size.parse()?;
 
@@ -340,12 +340,54 @@ mod tests {
             AsciiMetadataValue::from_static("7"),
         );
 
-        // Leave out block size key-value pair
+        // Leave out path key-value pair
         let extracted_metadata = extract_metadata_from_map(&dummy_map);
         assert!(extracted_metadata.is_err());
         let err = extracted_metadata.unwrap_err();
         if let Some(meta_err) = err.downcast_ref::<MetadataError>() {
             assert_eq!(meta_err, &MetadataError::KeyNotFoundError("path"));
+        }
+    }
+
+    #[test]
+    fn test_metadata_missing_value_path() {
+        let mut dummy_map = MetadataMap::new();
+        dummy_map.insert(
+            AsciiMetadataKey::from_static("path"),
+            AsciiMetadataValue::from_static(""),
+        );
+
+        dummy_map.insert(
+            AsciiMetadataKey::from_static("block_size"),
+            AsciiMetadataValue::from_static("7"),
+        );
+
+        let extracted_metadata = extract_metadata_from_map(&dummy_map);
+        assert!(extracted_metadata.is_err());
+        let err = extracted_metadata.unwrap_err();
+        if let Some(meta_err) = err.downcast_ref::<MetadataError>() {
+            assert_eq!(meta_err, &MetadataError::EmptyValueError("path"));
+        }
+    }
+
+    #[test]
+    fn test_metadata_missing_value_block_size() {
+        let mut dummy_map = MetadataMap::new();
+        dummy_map.insert(
+            AsciiMetadataKey::from_static("path"),
+            AsciiMetadataValue::from_static("/foo/bar"),
+        );
+
+        dummy_map.insert(
+            AsciiMetadataKey::from_static("block_size"),
+            AsciiMetadataValue::from_static(""),
+        );
+
+        let extracted_metadata = extract_metadata_from_map(&dummy_map);
+        assert!(extracted_metadata.is_err());
+        let err = extracted_metadata.unwrap_err();
+        if let Some(meta_err) = err.downcast_ref::<MetadataError>() {
+            assert_eq!(meta_err, &MetadataError::EmptyValueError("block_size"));
         }
     }
 }
