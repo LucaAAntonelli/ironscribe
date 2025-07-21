@@ -23,17 +23,26 @@ struct UploadStreamMetadata {
 
 fn extract_metadata_from_map(
     metadata_map: &tonic::metadata::MetadataMap,
-) -> Result<UploadStreamMetadata, anyhow::Error> {
+) -> Result<UploadStreamMetadata, MetadataError> {
     let paths = metadata_map.get_all("path").iter().collect::<Vec<_>>();
     dbg!(&paths);
     if paths.is_empty() {
-        bail!(MetadataError::KeyNotFoundError("path"))
+        return Err(MetadataError::KeyNotFoundError("path"));
     } else if paths.len() > 1 {
-        bail!(MetadataError::InvalidLengthError("path"))
+        return Err(MetadataError::InvalidLengthError("path"));
     }
-    let path = paths[0].to_str()?.to_owned();
+    let path = match paths[0].to_str() {
+        Ok(v) => v,
+        Err(_) => {
+            // Parsing to str failed => wrap debug-formatted string for extra info
+            return Err(MetadataError::InvalidFormatError(
+                "path",
+                format!("{:?}", paths[0]),
+            ));
+        }
+    };
     if path.is_empty() {
-        bail!(MetadataError::EmptyValueError("path"))
+        return Err(MetadataError::EmptyValueError("path"));
     }
 
     let block_sizes = metadata_map
@@ -41,17 +50,37 @@ fn extract_metadata_from_map(
         .iter()
         .collect::<Vec<_>>();
     if block_sizes.is_empty() {
-        bail!(MetadataError::KeyNotFoundError("block_size"))
+        return Err(MetadataError::KeyNotFoundError("block_size"));
     } else if block_sizes.len() > 1 {
-        bail!(MetadataError::InvalidLengthError("block_size"))
+        return Err(MetadataError::InvalidLengthError("block_size"));
     }
-    let block_size = block_sizes[0].to_str()?;
+    let block_size = match block_sizes[0].to_str() {
+        Ok(v) => v,
+        Err(_) => {
+            // Parsing to str failed => wrap debug-formatted string for extra info
+            return Err(MetadataError::InvalidFormatError(
+                "block_size",
+                format!("{:?}", block_sizes[0]),
+            ));
+        }
+    };
     if block_size.is_empty() {
-        bail!(MetadataError::EmptyValueError("block_size"))
+        return Err(MetadataError::EmptyValueError("block_size"));
     }
-    let block_size = block_size.parse()?;
+    let block_size = match block_size.parse() {
+        Ok(v) => v,
+        Err(_) => {
+            return Err(MetadataError::InvalidFormatError(
+                "block_size",
+                block_size.to_string(),
+            ));
+        }
+    };
 
-    Ok(UploadStreamMetadata { path, block_size })
+    Ok(UploadStreamMetadata {
+        path: path.to_string(),
+        block_size,
+    })
 }
 
 #[derive(Debug)]
@@ -280,6 +309,7 @@ impl DirSync for MyDirSync {
         request: Request<Streaming<Block>>,
     ) -> Result<Response<UploadResponse>, Status> {
         let metadata_map = request.metadata();
+        extract_metadata_from_map(metadata_map)?;
         let metadata = match extract_metadata_from_map(metadata_map) {
             Ok(x) => x,
             Err(e) => {
@@ -288,6 +318,11 @@ impl DirSync for MyDirSync {
         };
 
         let incoming_request = request.into_inner();
+        let path = metadata.path;
+        let block_size = metadata.block_size;
+
+        let abs_path = self.absolute_directory.join(clean_path(path));
+        create_dir_all(abs_path)?;
 
         todo!("IMPLEMENT upload_blocks()!");
     }
