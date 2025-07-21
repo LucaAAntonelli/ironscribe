@@ -328,10 +328,7 @@ mod tests {
         assert!(extracted_metadata.is_err());
         let err = extracted_metadata.unwrap_err();
         if let Some(meta_err) = err.downcast_ref::<MetadataError>() {
-            assert!(matches!(
-                meta_err,
-                &MetadataError::KeyNotFoundError("block_size")
-            ));
+            assert_eq!(meta_err, &MetadataError::KeyNotFoundError("block_size"));
         }
     }
 
@@ -348,7 +345,7 @@ mod tests {
         assert!(extracted_metadata.is_err());
         let err = extracted_metadata.unwrap_err();
         if let Some(meta_err) = err.downcast_ref::<MetadataError>() {
-            assert!(matches!(meta_err, &MetadataError::KeyNotFoundError("path")));
+            assert_eq!(meta_err, &MetadataError::KeyNotFoundError("path"));
         }
     }
 }
