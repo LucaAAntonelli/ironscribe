@@ -363,9 +363,7 @@ mod tests {
         let extracted_metadata = extract_metadata_from_map(&dummy_map);
         assert!(extracted_metadata.is_err());
         let err = extracted_metadata.unwrap_err();
-        if let Some(meta_err) = err.downcast_ref::<MetadataError>() {
-            assert_eq!(meta_err, &MetadataError::KeyNotFoundError("block_size"));
-        }
+        assert_eq!(err, MetadataError::KeyNotFoundError("block_size"));
     }
 
     #[test]
@@ -380,9 +378,7 @@ mod tests {
         let extracted_metadata = extract_metadata_from_map(&dummy_map);
         assert!(extracted_metadata.is_err());
         let err = extracted_metadata.unwrap_err();
-        if let Some(meta_err) = err.downcast_ref::<MetadataError>() {
-            assert_eq!(meta_err, &MetadataError::KeyNotFoundError("path"));
-        }
+        assert_eq!(err, MetadataError::KeyNotFoundError("path"));
     }
 
     #[test]
@@ -401,9 +397,7 @@ mod tests {
         let extracted_metadata = extract_metadata_from_map(&dummy_map);
         assert!(extracted_metadata.is_err());
         let err = extracted_metadata.unwrap_err();
-        if let Some(meta_err) = err.downcast_ref::<MetadataError>() {
-            assert_eq!(meta_err, &MetadataError::EmptyValueError("path"));
-        }
+        assert_eq!(err, MetadataError::EmptyValueError("path"));
     }
 
     #[test]
@@ -422,9 +416,7 @@ mod tests {
         let extracted_metadata = extract_metadata_from_map(&dummy_map);
         assert!(extracted_metadata.is_err());
         let err = extracted_metadata.unwrap_err();
-        if let Some(meta_err) = err.downcast_ref::<MetadataError>() {
-            assert_eq!(meta_err, &MetadataError::EmptyValueError("block_size"));
-        }
+        assert_eq!(err, MetadataError::EmptyValueError("block_size"));
     }
 
     #[test]
@@ -448,9 +440,7 @@ mod tests {
         let extracted_metadata = extract_metadata_from_map(&dummy_map);
         assert!(extracted_metadata.is_err());
         let err = extracted_metadata.unwrap_err();
-        if let Some(meta_err) = err.downcast_ref::<MetadataError>() {
-            assert_eq!(meta_err, &MetadataError::InvalidLengthError("path"));
-        }
+        assert_eq!(err, MetadataError::InvalidLengthError("path"));
     }
 
     #[test]
@@ -474,8 +464,6 @@ mod tests {
         let extracted_metadata = extract_metadata_from_map(&dummy_map);
         assert!(extracted_metadata.is_err());
         let err = extracted_metadata.unwrap_err();
-        if let Some(meta_err) = err.downcast_ref::<MetadataError>() {
-            assert_eq!(meta_err, &MetadataError::InvalidLengthError("block_size"));
-        }
+        assert_eq!(err, MetadataError::InvalidLengthError("block_size"));
     }
 }
