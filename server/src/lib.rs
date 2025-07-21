@@ -466,4 +466,28 @@ mod tests {
         let err = extracted_metadata.unwrap_err();
         assert_eq!(err, MetadataError::InvalidLengthError("block_size"));
     }
+
+    #[test]
+    fn test_metadata_block_size_parse_error() {
+        let mut dummy_map = MetadataMap::new();
+        dummy_map.insert(
+            AsciiMetadataKey::from_static("path"),
+            AsciiMetadataValue::from_static("/foo/bar"),
+        );
+        dummy_map.insert(
+            AsciiMetadataKey::from_static("block_size"),
+            AsciiMetadataValue::from_static("asdf"),
+        );
+        let extracted_metadata = extract_metadata_from_map(&dummy_map);
+        assert!(extracted_metadata.is_err());
+        let err = extracted_metadata.unwrap_err();
+        assert_eq!(
+            err,
+            MetadataError::InvalidFormatError("block_size", String::from("asdf"))
+        );
+        assert_ne!(
+            err,
+            MetadataError::InvalidFormatError("block_size", String::from("ghjk"))
+        );
+    }
 }
