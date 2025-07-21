@@ -66,7 +66,6 @@ impl Hasher {
 // FileChunker turns file into chunks to compute the checksums per block
 // If two files differ, try to sync only differing blocks
 pub struct FileChunker {
-    path: PathBuf,
     block_size: usize,
     file: std::fs::File,
 }
@@ -77,11 +76,7 @@ impl FileChunker {
             return Err(anyhow!("Block size cannot be zero!"));
         }
         let file = File::open(path.clone()).context("Failed to open file")?;
-        Ok(Self {
-            path,
-            block_size,
-            file,
-        })
+        Ok(Self { block_size, file })
     }
 }
 
