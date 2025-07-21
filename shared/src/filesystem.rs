@@ -50,13 +50,13 @@ impl Hasher {
         }
     }
 
-    pub fn compute_weak_byte_hash(&self, bytes: &Vec<u8>) -> u32 {
+    pub fn compute_weak_byte_hash(&self, bytes: &[u8]) -> u32 {
         let mut adler32 = RollingAdler32::new();
         adler32.update_buffer(bytes);
         adler32.hash()
     }
 
-    pub fn compute_strong_byte_hash(&self, bytes: &Vec<u8>) -> [u8; 32] {
+    pub fn compute_strong_byte_hash(&self, bytes: &[u8]) -> [u8; 32] {
         let mut sha256 = Sha256::new();
         sha256.update(bytes);
         sha256.finalize().into()
