@@ -15,6 +15,7 @@ use std::{
 };
 use tonic::{Request, Response, Status, Streaming};
 
+#[derive(Debug)]
 struct UploadStreamMetadata {
     path: String,
     block_size: usize,
@@ -293,6 +294,7 @@ impl DirSync for MyDirSync {
 
 #[cfg(test)]
 mod tests {
+    use shared::errors::MetadataError;
     use tonic::metadata::{AsciiMetadataKey, AsciiMetadataValue, MetadataMap};
 
     use super::*;
@@ -311,5 +313,42 @@ mod tests {
         let extracted_metadata = extract_metadata_from_map(&dummy_map).unwrap();
         assert_eq!(extracted_metadata.path, "/foo/bar");
         assert_eq!(extracted_metadata.block_size, 9);
+    }
+
+    #[test]
+    fn test_metadata_missing_key_block_size() {
+        let mut dummy_map = MetadataMap::new();
+        dummy_map.insert(
+            AsciiMetadataKey::from_static("path"),
+            AsciiMetadataValue::from_static("/foo/bar"),
+        );
+
+        // Leave out block size key-value pair
+        let extracted_metadata = extract_metadata_from_map(&dummy_map);
+        assert!(extracted_metadata.is_err());
+        let err = extracted_metadata.unwrap_err();
+        if let Some(meta_err) = err.downcast_ref::<MetadataError>() {
+            assert!(matches!(
+                meta_err,
+                &MetadataError::KeyNotFoundError("block_size")
+            ));
+        }
+    }
+
+    #[test]
+    fn test_metadata_missing_key_path() {
+        let mut dummy_map = MetadataMap::new();
+        dummy_map.insert(
+            AsciiMetadataKey::from_static("block_size"),
+            AsciiMetadataValue::from_static("7"),
+        );
+
+        // Leave out block size key-value pair
+        let extracted_metadata = extract_metadata_from_map(&dummy_map);
+        assert!(extracted_metadata.is_err());
+        let err = extracted_metadata.unwrap_err();
+        if let Some(meta_err) = err.downcast_ref::<MetadataError>() {
+            assert!(matches!(meta_err, &MetadataError::KeyNotFoundError("path")));
+        }
     }
 }
