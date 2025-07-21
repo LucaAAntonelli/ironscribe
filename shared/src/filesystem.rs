@@ -90,7 +90,10 @@ impl Iterator for FileChunker {
                 buffer.truncate(n);
                 Some(buffer)
             }
-            Err(e) => None,
+            Err(e) => {
+                eprintln!("Error when iterating over {:?}: {}", self.file, e);
+                None
+            }
         }
     }
 }
