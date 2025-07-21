@@ -25,6 +25,7 @@ fn extract_metadata_from_map(
     metadata_map: &tonic::metadata::MetadataMap,
 ) -> Result<UploadStreamMetadata, anyhow::Error> {
     let paths = metadata_map.get_all("path").iter().collect::<Vec<_>>();
+    dbg!(&paths);
     if paths.is_empty() {
         bail!(MetadataError::KeyNotFoundError("path"))
     } else if paths.len() > 1 {
@@ -388,6 +389,58 @@ mod tests {
         let err = extracted_metadata.unwrap_err();
         if let Some(meta_err) = err.downcast_ref::<MetadataError>() {
             assert_eq!(meta_err, &MetadataError::EmptyValueError("block_size"));
+        }
+    }
+
+    #[test]
+    fn test_metadata_more_than_one_path() {
+        let mut dummy_map = MetadataMap::new();
+        dummy_map.insert(
+            AsciiMetadataKey::from_static("path"),
+            AsciiMetadataValue::from_static("/foo/bar"),
+        );
+
+        dummy_map.append(
+            AsciiMetadataKey::from_static("path"),
+            AsciiMetadataValue::from_static("/foo/bar/baz"),
+        );
+
+        dummy_map.insert(
+            AsciiMetadataKey::from_static("block_size"),
+            AsciiMetadataValue::from_static("8"),
+        );
+
+        let extracted_metadata = extract_metadata_from_map(&dummy_map);
+        assert!(extracted_metadata.is_err());
+        let err = extracted_metadata.unwrap_err();
+        if let Some(meta_err) = err.downcast_ref::<MetadataError>() {
+            assert_eq!(meta_err, &MetadataError::InvalidLengthError("path"));
+        }
+    }
+
+    #[test]
+    fn test_metadata_more_than_one_block_size() {
+        let mut dummy_map = MetadataMap::new();
+        dummy_map.insert(
+            AsciiMetadataKey::from_static("path"),
+            AsciiMetadataValue::from_static("/foo/bar"),
+        );
+
+        dummy_map.insert(
+            AsciiMetadataKey::from_static("block_size"),
+            AsciiMetadataValue::from_static("8"),
+        );
+
+        dummy_map.append(
+            AsciiMetadataKey::from_static("block_size"),
+            AsciiMetadataValue::from_static("9"),
+        );
+
+        let extracted_metadata = extract_metadata_from_map(&dummy_map);
+        assert!(extracted_metadata.is_err());
+        let err = extracted_metadata.unwrap_err();
+        if let Some(meta_err) = err.downcast_ref::<MetadataError>() {
+            assert_eq!(meta_err, &MetadataError::InvalidLengthError("block_size"));
         }
     }
 }
