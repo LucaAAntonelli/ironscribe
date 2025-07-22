@@ -1,4 +1,3 @@
-use anyhow::bail;
 use shared::errors::MetadataError;
 use shared::filesystem::{FileChunker, Hasher, clean_path, force_copy, walk_filetree_and_apply};
 use shared::proto::Checksum;
@@ -227,24 +226,14 @@ impl DirSync for MyDirSync {
                     if let Some(found_path) =
                         self.get_file_with_matching_checksum(checksum.clone().try_into().unwrap())
                     {
-                        match force_copy(found_path, path.clone()) {
-                            Ok(_) => {
-                                println!("Copied file from path {:?}", path.clone());
-                                self.update_checksum(
-                                    path.clone(),
-                                    checksum.clone().try_into().unwrap(),
-                                );
-                                return Ok(Response::new(ChecksumResponse {
-                                    path: path.to_string_lossy().into_owned(),
-                                    checksum,
-                                    checksums: vec![],
-                                }));
-                            }
-                            Err(e) => {
-                                // Return status with error
-                                return Err(Status::aborted("Could not copy file"));
-                            }
-                        }
+                        force_copy(found_path, path.clone())?;
+                        println!("Copied file from path {:?}", path.clone());
+                        self.update_checksum(path.clone(), checksum.clone().try_into().unwrap());
+                        return Ok(Response::new(ChecksumResponse {
+                            path: path.to_string_lossy().into_owned(),
+                            checksum,
+                            checksums: vec![],
+                        }));
                     } else {
                         // no file with matching hash -> need client to stream blocks
                     }
@@ -255,24 +244,14 @@ impl DirSync for MyDirSync {
                 if let Some(found_path) =
                     self.get_file_with_matching_checksum(checksum.clone().try_into().unwrap())
                 {
-                    match force_copy(found_path, path.clone()) {
-                        Ok(_) => {
-                            println!("Copied file from path {:?}", path.clone());
-                            self.update_checksum(
-                                path.clone(),
-                                checksum.clone().try_into().unwrap(),
-                            );
-                            return Ok(Response::new(ChecksumResponse {
-                                path: path.clone().to_str().unwrap().to_owned(),
-                                checksum: checksum.clone(),
-                                checksums: vec![],
-                            }));
-                        }
-                        Err(e) => {
-                            // Return status with error
-                            return Err(Status::aborted("Could not copy file"));
-                        }
-                    }
+                    force_copy(found_path, path.clone())?;
+                    println!("Copied file from path {:?}", path.clone());
+                    self.update_checksum(path.clone(), checksum.clone().try_into().unwrap());
+                    return Ok(Response::new(ChecksumResponse {
+                        path: path.clone().to_str().unwrap().to_owned(),
+                        checksum: checksum.clone(),
+                        checksums: vec![],
+                    }));
                 } else {
                     // no file with matching hash -> need client to stream blocks
                 }
