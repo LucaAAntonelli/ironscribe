@@ -1,38 +1,6 @@
 # IronScribe
 A server-client application for ebook syncing and management written in Rust
 
-# Usage (WIP)
-Currently, books can be uploaded and downloaded via REST API:
-
-## Upload
-Create a JSON file, e.g., `sample.json` with the following structure:
-```json
-{
-    "id": "1",
-    "title": "Some Profound Title",
-    "author": "Bigshot McGee",
-    "format": "epub",
-    "content": [
-        1,
-        2,
-        3
-    ]
-}
-```
-Then, use the JSON object with the following `cURL` command:
-
-```
-curl.exe --request POST http://localhost:8080/upload --header "Content-Type: application/json" --data "@sample.json"
-```
-The `.exe` extension is needed on Windows because otherwise, PowerShell will use the included `cURL`, whereas `curl.exe` will invoke the version installed via Git Bash.
-
-## Download
-To download a book via REST API, simply call the `GET` request with the book's ID:
-```
-curl.exe --request GET http://localhost:8080/book/1
-```
-This returns the same JSON object as was used in the `POST` request.
-
 # Goals
 - [x] Look into a hybrid server that exposes gRPC and REST, as REST is better usable on the web
 - [ ] Create different components
@@ -44,9 +12,14 @@ This returns the same JSON object as was used in the `POST` request.
     - [ ] Analytics
 
 # Current Tasks:
-- Port sync functionality from [here](https://github.com/FZambia/dirsync)
-- Once done, look for possible improvements (more idiomatic Rust solutions, improvements based on use case of syncing shallow folder structures, ...)
-- Look into shortcommings of original repo, such as 
+- [ ] Port sync functionality from [here](https://github.com/FZambia/dirsync)
+  - [ ] Server
+  - [ ] Client
+- [ ] Once done, look for possible improvements
+  - [ ] Usage with ebook files -> folder structure likely similar to Calibre
+  - [ ] Books will likely be added either via GUI or by automatically copying from a specified folder, also similar to Calibre
+  - [ ] Because files will change only through GUI except previous point, no need for complex request-response for sync. Instead, create individual services for adding, editing and deleting
+- Look into short-comings of original repo, such as 
     - not working on Windows file system
     - only working from client to server, not bidirectionally
     - only working with a single client (might be necessary for web access later)
