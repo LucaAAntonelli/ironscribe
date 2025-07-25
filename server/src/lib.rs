@@ -1,3 +1,4 @@
+use sha2::Sha256;
 use shared::errors::MetadataError;
 use shared::filesystem::{FileChunker, Hasher, clean_path, force_copy, walk_filetree_and_apply};
 use shared::proto::Checksum;
@@ -12,6 +13,8 @@ use std::{
     path::Path,
     sync::RwLock,
 };
+use tokio::fs::{File, OpenOptions};
+use tokio::io::{AsyncReadExt, AsyncSeekExt};
 use tonic::{Request, Response, Status, Streaming};
 
 #[derive(Debug)]
@@ -288,17 +291,47 @@ impl DirSync for MyDirSync {
         request: Request<Streaming<Block>>,
     ) -> Result<Response<UploadResponse>, Status> {
         let metadata_map = request.metadata();
-        extract_metadata_from_map(metadata_map)?;
         let metadata = extract_metadata_from_map(metadata_map)?;
 
-        let incoming_request = request.into_inner();
+        let mut stream = request.into_inner();
         let path = metadata.path;
         let block_size = metadata.block_size;
 
         let abs_path = self.absolute_directory.join(clean_path(path));
-        create_dir_all(abs_path)?;
+        create_dir_all(&abs_path)?;
 
-        todo!("IMPLEMENT upload_blocks()!");
+        // Create temporary file to write into
+        let tmp_path = format!("/tmp/dirsync-{}.tmp", uuid::Uuid::new_v4());
+        let mut tmpfile = File::create(&tmp_path).await?;
+        // Create directory at which new file should be stored
+        create_dir_all(abs_path.parent().unwrap())
+            .map_err(|e| Status::internal(format!("Create dir error: {}", e)))?;
+
+        // Open existing file, used if block.reference, i.e., if a file exists from which we can
+        // copy
+        let mut existing_file = OpenOptions::new()
+            .read(true)
+            .open(&abs_path)
+            .await
+            .map_err(|e| Status::internal(format!("Open existing file error: {}", e)))?;
+
+        let mut hasher = Sha256::new();
+
+        while let Some(block) = stream.message().await? {
+            // Loop over blocks in incoming stream of messages
+            if block.reference {
+                let offset = block.number as u64 * block_size as u64;
+                let mut buf = vec![0u8; block_size];
+                existing_file.seek(std::io::SeekFrom::Start(offset)).await?;
+                let n = existing_file.read(&mut buf).await?;
+                hasher.update(&buf[..n]);
+            } else {
+                let payload = block.payload;
+                hasher.update(&payload);
+            }
+        }
+
+        Ok(Response::new(UploadResponse {}))
     }
 }
 
