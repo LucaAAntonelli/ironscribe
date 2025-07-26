@@ -1,3 +1,5 @@
+use chrono::Utc;
+use sha2::{Digest, Sha256};
 use shared::errors::MetadataError;
 use shared::filesystem::{FileChunker, Hasher, clean_path, force_copy, walk_filetree_and_apply};
 use shared::proto::Checksum;
@@ -5,7 +7,9 @@ use shared::proto::{
     Block, ChecksumRequest, ChecksumResponse, DiffRequest, DiffResponse, SyncRequest, SyncResponse,
     UploadResponse, dir_sync_server::DirSync,
 };
-use std::fs::{create_dir_all, remove_dir_all, remove_file};
+use std::fs::{File, create_dir_all, remove_dir_all, remove_file};
+use std::io::Write;
+use std::os::unix::fs::FileExt;
 use std::path::PathBuf;
 use std::{
     collections::{HashMap, HashSet},
@@ -297,21 +301,58 @@ impl DirSync for MyDirSync {
         let abs_path = self.absolute_directory.join(clean_path(path));
 
         // Create temporary file to write into
+        // Use current date and time in filename for unique names
+        let timestamp = Utc::now().to_rfc3339();
+        let tmp_path = format!("tmp_{}", timestamp);
+        let mut tmpfile = File::create_new(tmp_path.clone())
+            .map_err(|e| Status::internal(format!("Error creating temp file: {}", e)))?;
 
         // Create directory at which new file should be stored
         create_dir_all(&abs_path)?;
 
         // Open existing file, used if block.reference, i.e., if a file exists from which we can
         // copy
+        let existing_file = File::open(abs_path.clone())
+            .map_err(|e| Status::internal(format!("Error opening existing file: {}", e)))?;
+
+        // Create hash object to incrementally compute file hash
+        let mut hasher = Sha256::new();
 
         while let Some(block) = stream.message().await? {
             // Loop over blocks in incoming stream of messages
             if block.reference {
                 // Use block from existing file on server
+                let mut buffer = vec![0u8; block_size];
+                let n = existing_file
+                    .read_at(&mut buffer, block.number as u64 * block_size as u64)
+                    .map_err(|e| {
+                        Status::internal(format!("Error reading from existing file: {}", e))
+                    })?;
+                tmpfile
+                    .write(&buffer[0..n])
+                    .map_err(|e| Status::internal(format!("Error writing to temp file: {}", e)))?;
+                hasher
+                    .write(&buffer[0..n])
+                    .map_err(|e| Status::internal(format!("Error appending to hash: {}", e)))?;
             } else {
                 // Use block from stream
+                tmpfile
+                    .write(&block.payload)
+                    .map_err(|e| Status::internal(format!("Error writing to temp file: {}", e)))?;
+                hasher
+                    .write(&block.payload)
+                    .map_err(|e| Status::internal(format!("Error appending to hash: {}", e)))?;
             }
         }
+        // We arrive here only if every block was successfully handled
+
+        // Move tmpfile to correct place now that everything is successfully written, "")
+        std::fs::rename(tmp_path, abs_path.clone())
+            .map_err(|e| Status::internal(format!("Error moving temp file: {}", e)))?;
+
+        // Compute file checksum and add it to checksum map
+        let checksum: [u8; 32] = hasher.finalize().into();
+        self.update_checksum(abs_path, checksum);
 
         Ok(Response::new(UploadResponse {}))
     }
