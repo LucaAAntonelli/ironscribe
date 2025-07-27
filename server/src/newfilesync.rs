@@ -8,6 +8,8 @@ use tokio::io::AsyncWriteExt;
 use tokio_stream::StreamExt;
 use tonic::{Request, Response, Status, Streaming};
 use tracing::error;
+
+#[derive(Default)]
 pub struct BookServer {
     directory: Arc<PathBuf>,
 }
