@@ -855,7 +855,9 @@ dependencies = [
  "sha2",
  "shared",
  "tokio",
+ "tokio-stream",
  "tonic",
+ "tracing",
 ]
 
 [[package]]

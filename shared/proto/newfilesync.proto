@@ -2,7 +2,7 @@ syntax = "proto3";
 
 package LibrarySync;
 
-service Sync {
+service BookSync {
   rpc AddBook(stream AddBookRequest) returns (AddBookResponse);
 }
 
