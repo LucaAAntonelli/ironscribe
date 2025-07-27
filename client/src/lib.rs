@@ -1,3 +1,4 @@
+pub mod newfilesync;
 use chrono::Utc;
 use shared::proto::dir_sync_client::DirSyncClient;
 use std::{error::Error, path::PathBuf};

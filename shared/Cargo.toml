@@ -7,7 +7,7 @@ edition = "2024"
 tonic.workspace = true
 prost.workspace = true
 sha2 = "0.10.9"
-anyhow = "1.0.98"
+anyhow.workspace = true
 adler32 = "1.2.0"
 
 [build-dependencies]

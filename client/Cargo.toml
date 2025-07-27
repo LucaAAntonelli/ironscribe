@@ -5,6 +5,9 @@ edition = "2024"
 
 [dependencies]
 tokio.workspace = true
+tokio-stream.workspace = true
 shared = { path = "../shared" }
 tonic.workspace = true
 chrono = "0.4.41"
+tracing = "0.1.41"
+anyhow.workspace = true
