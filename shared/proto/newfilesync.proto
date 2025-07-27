@@ -1,0 +1,18 @@
+syntax = "proto3";
+
+package LibrarySync;
+
+service Sync {
+  rpc AddBook(stream AddBookRequest) returns (AddBookResponse);
+}
+
+message AddBookRequest {
+  oneof type {
+    string name = 1;
+    bytes chunk = 2;
+  }
+}
+
+message AddBookResponse {
+
+}
