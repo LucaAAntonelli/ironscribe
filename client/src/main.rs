@@ -30,20 +30,6 @@ impl Default for MyApp {
     }
 }
 
-impl MyApp {
-    fn new(ctx: &CreationContext) -> Self {
-        ctx.egui_ctx.set_pixels_per_point(1.25);
-        Self {
-            rt: tokio::runtime::Builder::new_multi_thread()
-                .enable_all()
-                .build()
-                .unwrap(),
-            name: "Some name".to_string(),
-            age: 42,
-        }
-    }
-}
-
 impl eframe::App for MyApp {
     fn update(&mut self, ctx: &egui::Context, _frame: &mut eframe::Frame) {
         egui::CentralPanel::default().show(ctx, |ui| {
