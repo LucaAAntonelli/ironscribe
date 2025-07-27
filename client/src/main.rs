@@ -1,5 +1,6 @@
 use client::newfilesync::BookClient;
 use eframe::{CreationContext, egui};
+use egui_file_dialog::FileDialog;
 use tonic::transport::Channel;
 
 fn main() {
@@ -44,6 +45,15 @@ impl eframe::App for MyApp {
                 self.age += 1;
             }
             ui.label(format!("Helllo '{}', age {}", self.name, self.age));
+            let mut file_dialog = FileDialog::new();
+            if ui.button("Select file").clicked() {
+                println!("Send gRPC add book request");
+                file_dialog.pick_file();
+            }
+            file_dialog.update(ctx);
+            if let Some(path) = file_dialog.take_picked() {
+                println!("User selected: {:?}", path);
+            }
         });
     }
 }

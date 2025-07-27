@@ -12,3 +12,4 @@ chrono = "0.4.41"
 tracing = "0.1.41"
 anyhow.workspace = true
 eframe = "0.32.0"
+egui-file-dialog = "0.11.0"
