@@ -18,15 +18,21 @@ struct MyApp {
     rt: tokio::runtime::Runtime,
     file_dialog: FileDialog,
     picked_file: Option<PathBuf>,
+    grpc_client: BookClient<Channel>,
 }
 
 impl Default for MyApp {
     fn default() -> Self {
+        let rt = tokio::runtime::Builder::new_multi_thread()
+            .enable_all()
+            .build()
+            .expect("Failed to build tokio runtime!");
+        let grpc_client = rt
+            .block_on(BookClient::new("[::1]", 50051, None, None, None))
+            .expect("Failed to create gRPC client!");
         Self {
-            rt: tokio::runtime::Builder::new_multi_thread()
-                .enable_all()
-                .build()
-                .unwrap(),
+            rt,
+            grpc_client,
             file_dialog: FileDialog::new(),
             picked_file: None,
         }
