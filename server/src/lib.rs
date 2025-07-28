@@ -1,4 +1,5 @@
 pub mod newfilesync;
+/*
 use chrono::Utc;
 use sha2::{Digest, Sha256};
 use shared::errors::MetadataError;
@@ -10,7 +11,6 @@ use shared::proto::{
 };
 use std::fs::{File, create_dir_all, remove_dir_all, remove_file};
 use std::io::Write;
-use std::os::unix::fs::FileExt;
 use std::path::PathBuf;
 use std::{
     collections::{HashMap, HashSet},
@@ -522,3 +522,4 @@ mod tests {
         );
     }
 }
+*/
