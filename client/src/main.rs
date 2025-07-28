@@ -44,13 +44,20 @@ impl eframe::App for MyApp {
         egui::CentralPanel::default().show(ctx, |ui| {
             ui.heading("My egui Application");
             if ui.button("Select file").clicked() {
-                println!("Send gRPC add book request");
                 self.file_dialog.pick_file();
             }
             self.file_dialog.update(ctx);
             if let Some(path) = self.file_dialog.take_picked() {
-                self.picked_file = Some(path);
+                self.picked_file = Some(path.clone());
                 println!("User selected: {:?}", self.picked_file);
+                let cloned_path = path.clone();
+                // TODO: wrap grpc_client in Arc<tokio::sync::Mutex<_>>
+                self.rt.spawn(async move {
+                    self.grpc_client.add_book(
+                        cloned_path.to_str().unwrap().to_owned(),
+                        "C:\\Users\\lucaa\\Projects\\ironscribe\\TESTING".into(),
+                    )
+                });
             }
         });
     }
