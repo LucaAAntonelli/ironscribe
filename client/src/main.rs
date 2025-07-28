@@ -1,3 +1,5 @@
+use std::path::PathBuf;
+
 use client::newfilesync::BookClient;
 use eframe::{CreationContext, egui};
 use egui_file_dialog::FileDialog;
@@ -16,6 +18,8 @@ struct MyApp {
     rt: tokio::runtime::Runtime,
     name: String,
     age: u32,
+    file_dialog: FileDialog,
+    picked_file: Option<PathBuf>,
 }
 
 impl Default for MyApp {
@@ -27,6 +31,8 @@ impl Default for MyApp {
                 .unwrap(),
             name: "Hello World".to_string(),
             age: 42,
+            file_dialog: FileDialog::new(),
+            picked_file: None,
         }
     }
 }
@@ -45,13 +51,12 @@ impl eframe::App for MyApp {
                 self.age += 1;
             }
             ui.label(format!("Helllo '{}', age {}", self.name, self.age));
-            let mut file_dialog = FileDialog::new();
             if ui.button("Select file").clicked() {
                 println!("Send gRPC add book request");
-                file_dialog.pick_file();
+                self.file_dialog.pick_file();
             }
-            file_dialog.update(ctx);
-            if let Some(path) = file_dialog.take_picked() {
+            self.file_dialog.update(ctx);
+            if let Some(path) = self.file_dialog.take_picked() {
                 println!("User selected: {:?}", path);
             }
         });
