@@ -21,7 +21,7 @@ impl BookServer {
         }
     }
 }
-
+// TODO: Add traces for more information about program execution
 #[tonic::async_trait]
 impl BookSync for BookServer {
     async fn add_book(
