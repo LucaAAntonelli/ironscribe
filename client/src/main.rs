@@ -1,16 +1,16 @@
-use std::path::PathBuf;
-
 use client::newfilesync::BookClient;
-use eframe::{CreationContext, egui};
+use eframe::egui;
 use egui_file_dialog::FileDialog;
+use std::path::PathBuf;
+use std::sync::Arc;
 use tonic::transport::Channel;
 
 fn main() {
-    let mut options = eframe::NativeOptions::default();
+    let options = eframe::NativeOptions::default();
     eframe::run_native(
         "HELLOWORLD",
         options,
-        Box::new(|cc| Ok(Box::<MyApp>::default())),
+        Box::new(|_cc| Ok(Box::<MyApp>::default())),
     );
 }
 
@@ -18,7 +18,7 @@ struct MyApp {
     rt: tokio::runtime::Runtime,
     file_dialog: FileDialog,
     picked_file: Option<PathBuf>,
-    grpc_client: BookClient<Channel>,
+    grpc_client: Arc<tokio::sync::Mutex<BookClient<Channel>>>,
 }
 
 impl Default for MyApp {
@@ -30,6 +30,7 @@ impl Default for MyApp {
         let grpc_client = rt
             .block_on(BookClient::new("[::1]", 50051, None, None, None))
             .expect("Failed to create gRPC client!");
+        let grpc_client = Arc::new(tokio::sync::Mutex::new(grpc_client));
         Self {
             rt,
             grpc_client,
@@ -52,11 +53,19 @@ impl eframe::App for MyApp {
                 println!("User selected: {:?}", self.picked_file);
                 let cloned_path = path.clone();
                 // TODO: wrap grpc_client in Arc<tokio::sync::Mutex<_>>
+                let client = Arc::clone(&self.grpc_client);
                 self.rt.spawn(async move {
-                    self.grpc_client.add_book(
-                        cloned_path.to_str().unwrap().to_owned(),
-                        "C:\\Users\\lucaa\\Projects\\ironscribe\\TESTING".into(),
-                    )
+                    let mut client = client.lock().await;
+                    match client
+                        .add_book(
+                            cloned_path.to_str().unwrap().to_owned(),
+                            "C:\\Users\\lucaa\\Projects\\ironscribe\\TESTING".into(),
+                        )
+                        .await
+                    {
+                        Ok(response) => println!("Got response: {:?}", response),
+                        Err(e) => println!("Got error: {:?}", e),
+                    }
                 });
             }
         });
