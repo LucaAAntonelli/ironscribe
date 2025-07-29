@@ -52,7 +52,6 @@ impl eframe::App for MyApp {
                 self.picked_file = Some(path.clone());
                 println!("User selected: {:?}", self.picked_file);
                 let cloned_path = path.clone();
-                // TODO: wrap grpc_client in Arc<tokio::sync::Mutex<_>>
                 let client = Arc::clone(&self.grpc_client);
                 self.rt.spawn(async move {
                     let mut client = client.lock().await;
