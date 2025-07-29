@@ -1,10 +1,11 @@
-use client::newfilesync::BookClient;
+use client::BookClient;
 use eframe::egui;
 use egui_file_dialog::FileDialog;
 use std::path::PathBuf;
 use std::sync::Arc;
 use tonic::transport::Channel;
 
+// TODO: Figure out why file picker opens so slowly on home desktop
 fn main() {
     let options = eframe::NativeOptions::default();
     eframe::run_native(
@@ -54,6 +55,7 @@ impl eframe::App for MyApp {
                 let cloned_path = path.clone();
                 let client = Arc::clone(&self.grpc_client);
                 self.rt.spawn(async move {
+                    // TODO: Retrieve server response and display in GUI
                     let mut client = client.lock().await;
                     match client
                         .add_book(
