@@ -11,6 +11,10 @@ A server-client application for ebook syncing and management written in Rust
         - [ ] Book metadata
     - [ ] Analytics
 
+
+# Current Problems
+I'm trying to use the implementation of file transfer from [grpc-file-transfer-rust](https://github.com/optimumood/grpc-file-transfer-rust), and while the original project works, I haven't been able to adapt it to my use case fully. One problem is that the server gets flagged by some anti-malware software on my PC, whereas the original project still works without any problems. In addition to that, even though I'm using the exact same functions and implementations on client and server, the request and response somehow don't do anything for some reason. What I have noticed is that the original project requires you to specify the path of a client file split as the file name and the path to its folder because the path gets assembled in the call to upload, and the server needs an existing directory in order to accept the upload, i.e., if the server's folder doesn't exist, the request fails automatically. 
+
 # Current Tasks:
 - [ ] Port sync functionality from [here](https://github.com/FZambia/dirsync)
   - [ ] Server

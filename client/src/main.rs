@@ -57,11 +57,10 @@ impl eframe::App for MyApp {
                 self.rt.spawn(async move {
                     // TODO: Retrieve server response and display in GUI
                     let mut client = client.lock().await;
+                    let file = cloned_path.file_name().unwrap().to_str().unwrap();
+                    let directory = cloned_path.to_str().unwrap().replace(file, "");
                     match client
-                        .add_book(
-                            cloned_path.to_str().unwrap().to_owned(),
-                            "C:\\Users\\lucaa\\Projects\\ironscribe\\TESTING".into(),
-                        )
+                        .add_book(file.to_owned(), PathBuf::from(directory))
                         .await
                     {
                         Ok(response) => println!("Got response: {:?}", response),
