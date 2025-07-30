@@ -1,35 +1,13 @@
-use anyhow::{Result, anyhow};
+use anyhow::anyhow;
 use shared::proto::{
     AddBookRequest, AddBookResponse, add_book_request, book_sync_server::BookSync,
 };
-use std::{
-    path::{Path, PathBuf},
-    sync::Arc,
-};
+use std::{path::PathBuf, sync::Arc};
 use tokio::fs;
 use tokio::io::AsyncWriteExt;
 use tokio_stream::StreamExt;
-use tonic::transport::{Certificate, Identity, ServerTlsConfig};
 use tonic::{Request, Response, Status, Streaming};
 use tracing::{error, instrument};
-
-fn create_tls_config(
-    cert_path: &Path,
-    key_path: &Path,
-    ca_cert_path: &Path,
-) -> Result<ServerTlsConfig> {
-    let cert = std::fs::read_to_string(cert_path)?;
-    let key = std::fs::read_to_string(key_path)?;
-    let ca_cert = std::fs::read_to_string(ca_cert_path)?;
-
-    let identity = Identity::from_pem(cert, key);
-    let client_ca_cert = Certificate::from_pem(ca_cert);
-    let tls_config = ServerTlsConfig::new()
-        .identity(identity)
-        .client_ca_root(client_ca_cert);
-
-    Ok(tls_config)
-}
 
 #[derive(Debug)]
 pub struct BookServer {
