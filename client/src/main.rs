@@ -29,7 +29,7 @@ impl Default for MyApp {
             .build()
             .expect("Failed to build tokio runtime!");
         let grpc_client = rt
-            .block_on(BookClient::new("[::1]", 50051, None, None, None))
+            .block_on(BookClient::new("127.0.0.1", 50051, None, None, None))
             .expect("Failed to create gRPC client!");
         let grpc_client = Arc::new(tokio::sync::Mutex::new(grpc_client));
         Self {
@@ -57,11 +57,10 @@ impl eframe::App for MyApp {
                 self.rt.spawn(async move {
                     // TODO: Retrieve server response and display in GUI
                     let mut client = client.lock().await;
+                    let file = cloned_path.file_name().unwrap().to_str().unwrap();
+                    let directory = cloned_path.to_str().unwrap().replace(file, "");
                     match client
-                        .add_book(
-                            cloned_path.to_str().unwrap().to_owned(),
-                            "C:\\Users\\lucaa\\Projects\\ironscribe\\TESTING".into(),
-                        )
+                        .add_book(file.to_owned(), PathBuf::from(directory))
                         .await
                     {
                         Ok(response) => println!("Got response: {:?}", response),
