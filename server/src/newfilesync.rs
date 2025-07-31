@@ -1,6 +1,7 @@
 use anyhow::anyhow;
 use shared::proto::{
-    AddBookRequest, AddBookResponse, add_book_request, book_sync_server::BookSync,
+    AddBookRequest, AddBookResponse, DeleteBookRequest, DeleteBookResponse, UpdateBookRequest,
+    UpdateBookResponse, add_book_request, book_sync_server::BookSync,
 };
 use std::{path::PathBuf, sync::Arc};
 use tokio::fs;
@@ -86,5 +87,19 @@ impl BookSync for BookServer {
             println!("Successfully added book!");
             Ok(Response::new(AddBookResponse::default()))
         }
+    }
+
+    async fn delete_book(
+        &self,
+        request: Request<DeleteBookRequest>,
+    ) -> tonic::Result<Response<DeleteBookResponse>, Status> {
+        Ok(Response::new(DeleteBookResponse::default()))
+    }
+
+    async fn update_book(
+        &self,
+        request: Request<Streaming<UpdateBookRequest>>,
+    ) -> tonic::Result<Response<UpdateBookResponse>, Status> {
+        Ok(Response::new(UpdateBookResponse::default()))
     }
 }
