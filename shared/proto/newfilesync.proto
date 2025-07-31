@@ -4,6 +4,8 @@ package LibrarySync;
 
 service BookSync {
   rpc AddBook(stream AddBookRequest) returns (AddBookResponse);
+  rpc DeleteBook(DeleteBookRequest) returns (DeleteBookResponse);
+  rpc UpdateBook(stream UpdateBookRequest) returns (UpdateBookResponse);
 }
 
 message AddBookRequest {
@@ -16,3 +18,17 @@ message AddBookRequest {
 message AddBookResponse {
 
 }
+
+message DeleteBookRequest {
+  string path = 1;
+}
+
+message DeleteBookResponse {}
+
+message UpdateBookRequest {
+  bytes chunk = 1;
+  uint32 index = 2;
+  string path = 3;
+}
+
+message UpdateBookResponse {}
