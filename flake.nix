@@ -55,6 +55,24 @@
           defaultApp = utils.lib.mkApp {
               drv = self.defaultPackage."${system}";
             };
+          devShell = with pkgs; mkShell {
+              buildInputs = [
+                cargo
+                rust-analyzer
+                rustPackages.clippy
+                rustc
+                rustfmt
+                tokei
+                openssl
+                pkg-config
+                xorg.libxcb
+                gcc
+                protobuf
+              ];
+              RUST_SRC_PATH = rustPlatform.rustLibSrc;
+              LD_LIBRARY_PATH = libPath;
+              GIT_EXTERNAL_DIFF = "${difftastic}/bin/difft";
+            };
 
         });
 }
