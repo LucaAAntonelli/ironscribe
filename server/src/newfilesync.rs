@@ -15,16 +15,6 @@ pub struct BookServer {
     directory: Arc<PathBuf>,
 }
 
-impl Default for BookServer {
-    fn default() -> Self {
-        Self {
-            directory: Arc::new(PathBuf::from(
-                "C:\\Users\\lucaa\\Projects\\ironscribe\\TESTING",
-            )),
-        }
-    }
-}
-
 impl BookServer {
     #[instrument]
     pub fn new(directory: PathBuf) -> Self {

@@ -13,8 +13,11 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
     let listener = TcpIncoming::from(listener);
 
     let file_service_impl = BookServer::new(
-        PathBuf::from_str("C:\\Users\\Luca.Antonelli\\Documents\\Scripts\\ironscribe\\TESTING")
-            .unwrap(),
+        PathBuf::from_str(
+            //     "C:\\Users\\Luca.Antonelli\\Documents\\Scripts\\ironscribe\\TESTING"
+            "/home/luca/tmp",
+        )
+        .unwrap(),
     );
     let file_service_server = BookSyncServer::new(file_service_impl);
 
