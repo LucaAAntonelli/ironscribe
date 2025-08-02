@@ -1,11 +1,11 @@
 use anyhow::Result;
-use shared::proto::AddBookRequest;
-use shared::proto::add_book_request;
-use shared::proto::book_sync_client::BookSyncClient;
+use shared::proto::{
+    AddBookRequest, ListBooksRequest, add_book_request, book_sync_client::BookSyncClient,
+};
 use std::net::IpAddr;
 use std::path::PathBuf;
 use tokio::{fs, io::AsyncReadExt, sync::mpsc};
-use tokio_stream::wrappers::ReceiverStream;
+use tokio_stream::{StreamExt, wrappers::ReceiverStream};
 use tonic::transport::{Certificate, ClientTlsConfig, Identity, channel::Channel};
 use tracing::{Instrument, debug, error, instrument};
 
@@ -142,6 +142,23 @@ impl BookClient<Channel> {
             error!(%err);
             Err(err)?;
         }
+
+        Ok(())
+    }
+
+    #[instrument(skip(self))]
+    pub async fn list_books(&mut self) -> Result<()> {
+        let mut books = Vec::new();
+
+        let response = self.client.list_books(ListBooksRequest {}).await?;
+
+        let mut books_stream = response.into_inner();
+
+        while let Some(book) = books_stream.next().await {
+            books.push(book?);
+        }
+
+        println!("{:?}", books);
 
         Ok(())
     }
