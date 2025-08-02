@@ -1,14 +1,16 @@
 use anyhow::anyhow;
 use shared::proto::{
-    AddBookRequest, AddBookResponse, DeleteBookRequest, DeleteBookResponse, UpdateBookRequest,
-    UpdateBookResponse, add_book_request, book_sync_server::BookSync,
+    AddBookRequest, AddBookResponse, DeleteBookRequest, DeleteBookResponse, ListBooksRequest,
+    ListBooksResponse, UpdateBookRequest, UpdateBookResponse, add_book_request,
+    book_sync_server::BookSync,
 };
 use std::{path::PathBuf, sync::Arc};
 use tokio::fs;
 use tokio::io::AsyncWriteExt;
-use tokio_stream::StreamExt;
+use tokio::sync::mpsc;
+use tokio_stream::{StreamExt, wrappers::ReceiverStream};
 use tonic::{Code, Request, Response, Status, Streaming};
-use tracing::{error, instrument};
+use tracing::{Instrument, error, instrument};
 
 #[derive(Debug)]
 pub struct BookServer {
@@ -16,6 +18,8 @@ pub struct BookServer {
 }
 
 impl BookServer {
+    const CHANNEL_SIZE: usize = 10;
+    const CHUNK_BYTE_SIZE: u64 = 1024 * 1024;
     #[instrument]
     pub fn new(directory: PathBuf) -> Self {
         println!("Creating BookServer instance!");
@@ -28,9 +32,10 @@ impl BookServer {
         self.directory.to_str().to_owned().unwrap().to_string()
     }
 }
-// TODO: Add traces for more information about program execution
 #[tonic::async_trait]
 impl BookSync for BookServer {
+    type ListBooksStream = ReceiverStream<Result<ListBooksResponse, Status>>;
+
     #[instrument]
     async fn add_book(
         &self,
@@ -79,6 +84,7 @@ impl BookSync for BookServer {
         }
     }
 
+    #[instrument]
     async fn delete_book(
         &self,
         request: Request<DeleteBookRequest>,
@@ -121,10 +127,68 @@ impl BookSync for BookServer {
         }
     }
 
+    #[instrument]
     async fn update_book(
         &self,
         request: Request<Streaming<UpdateBookRequest>>,
     ) -> tonic::Result<Response<UpdateBookResponse>, Status> {
         Ok(Response::new(UpdateBookResponse::default()))
+    }
+
+    #[instrument(skip(self))]
+    async fn list_books(
+        &self,
+        _request: Request<ListBooksRequest>,
+    ) -> Result<Response<Self::ListBooksStream>, Status> {
+        let (tx, rx) = mpsc::channel(Self::CHANNEL_SIZE);
+        let directory = Arc::clone(&self.directory);
+        let tx_error = tx.clone();
+
+        tokio::spawn(
+            async move {
+                let result = async move {
+                    let mut dir_stream = fs::read_dir(directory.as_ref()).await?;
+
+                    while let Some(dir_entry) = dir_stream.next_entry().await? {
+                        let file_metadata = dir_entry.metadata().await?;
+                        if !file_metadata.is_file() {
+                            continue;
+                        }
+                        let file_name = dir_entry.file_name().into_string().map_err(|e| {
+                            anyhow!("OsString convertion failed: {:?}", e.to_string_lossy())
+                        })?;
+                        let file_size = file_metadata.len();
+
+                        if let Err(err) = tx
+                            .send(Ok(ListBooksResponse {
+                                name: file_name,
+                                size: file_size,
+                            }))
+                            .await
+                        {
+                            error!(%err);
+                            break;
+                        }
+                    }
+
+                    Ok::<(), anyhow::Error>(())
+                }
+                .await;
+
+                if let Err(err) = result {
+                    error!(%err);
+                    let send_result = tx_error
+                        .send(Err(Status::internal("Failed to list files")))
+                        .await;
+
+                    if let Err(err) = send_result {
+                        error!(%err);
+                    }
+                }
+            }
+            .in_current_span(),
+        );
+
+        Ok(Response::new(ReceiverStream::new(rx)))
     }
 }

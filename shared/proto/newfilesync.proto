@@ -6,6 +6,7 @@ service BookSync {
   rpc AddBook(stream AddBookRequest) returns (AddBookResponse);
   rpc DeleteBook(DeleteBookRequest) returns (DeleteBookResponse);
   rpc UpdateBook(stream UpdateBookRequest) returns (UpdateBookResponse);
+  rpc ListBooks(ListBooksRequest) returns (stream ListBooksResponse);
 }
 
 message AddBookRequest {
@@ -32,3 +33,10 @@ message UpdateBookRequest {
 }
 
 message UpdateBookResponse {}
+
+message ListBooksRequest {}
+
+message ListBooksResponse {
+  string name = 1;
+  uint64 size = 2;
+}
