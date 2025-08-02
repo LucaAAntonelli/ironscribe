@@ -7,7 +7,7 @@ use std::{path::PathBuf, sync::Arc};
 use tokio::fs;
 use tokio::io::AsyncWriteExt;
 use tokio_stream::StreamExt;
-use tonic::{Request, Response, Status, Streaming};
+use tonic::{Code, Request, Response, Status, Streaming};
 use tracing::{error, instrument};
 
 #[derive(Debug)]
@@ -83,7 +83,42 @@ impl BookSync for BookServer {
         &self,
         request: Request<DeleteBookRequest>,
     ) -> tonic::Result<Response<DeleteBookResponse>, Status> {
-        Ok(Response::new(DeleteBookResponse::default()))
+        // Client sends request with path of a deleted file -> delete on server too
+        let request = request.into_inner();
+        let path = PathBuf::from(request.path);
+        if !path.exists() {
+            // Path doesn't exist
+            return Err(Status::new(
+                Code::NotFound,
+                format!("File {path:?} doesn't exist, cannot delete!"),
+            ));
+        }
+        // Path exists -> try to delete and return result
+        if path.is_file() {
+            match std::fs::remove_file(path.clone()) {
+                Ok(_) => {
+                    return Ok(Response::new(DeleteBookResponse::default()));
+                }
+                Err(e) => {
+                    return Err(Status::new(
+                        tonic::Code::Unknown,
+                        format!("Error deleting file {path:?}: {e}"),
+                    ));
+                }
+            }
+        }
+        // Path is directory -> try to delete and return result
+        match std::fs::remove_dir_all(path.clone()) {
+            Ok(_) => {
+                return Ok(Response::new(DeleteBookResponse::default()));
+            }
+            Err(e) => {
+                return Err(Status::new(
+                    Code::Unknown,
+                    format!("Error deleting directory {path:?}: {e}"),
+                ));
+            }
+        }
     }
 
     async fn update_book(
