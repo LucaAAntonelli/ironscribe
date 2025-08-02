@@ -68,6 +68,13 @@ impl eframe::App for MyApp {
                     }
                 });
             }
+            if ui.button("List Books").clicked() {
+                let client = Arc::clone(&self.grpc_client);
+                self.rt.spawn(async move {
+                    let mut client = client.lock().await;
+                    client.list_books().await;
+                });
+            }
         });
     }
 }
