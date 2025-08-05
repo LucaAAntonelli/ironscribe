@@ -1,4 +1,7 @@
+pub mod app;
+pub mod db;
 use anyhow::Result;
+use db::DatabaseClient;
 use shared::proto::{
     AddBookRequest, ListBooksRequest, add_book_request, book_sync_client::BookSyncClient,
 };
@@ -41,7 +44,8 @@ fn create_tls_config(
 
 #[derive(Clone)]
 pub struct BookClient<T> {
-    client: BookSyncClient<T>,
+    sync_client: BookSyncClient<T>,
+    db_client: DatabaseClient,
 }
 
 impl<T> BookClient<T> {
@@ -76,7 +80,10 @@ impl BookClient<Channel> {
         let client = BookSyncClient::new(channel);
 
         debug!("Connected");
-        Ok(Self { client })
+        Ok(Self {
+            sync_client: client,
+            db_client: DatabaseClient {},
+        })
     }
 
     // TODO: Change return type so result of function call can be used in GUI
@@ -136,7 +143,7 @@ impl BookClient<Channel> {
             .in_current_span(),
         );
 
-        self.client.add_book(receiver_stream).await?;
+        self.sync_client.add_book(receiver_stream).await?;
 
         if let Err(err) = task_handle.await? {
             error!(%err);
@@ -150,7 +157,7 @@ impl BookClient<Channel> {
     pub async fn list_books(&mut self) -> Result<()> {
         let mut books = Vec::new();
 
-        let response = self.client.list_books(ListBooksRequest {}).await?;
+        let response = self.sync_client.list_books(ListBooksRequest {}).await?;
 
         let mut books_stream = response.into_inner();
 
