@@ -11,6 +11,15 @@ tonic.workspace = true
 chrono = "0.4.41"
 tracing = "0.1.41"
 anyhow.workspace = true
-eframe = "0.32.0"
+egui = "0.32.0"
+eframe = { version = "0.32.0", default-features = false, features = ["accesskit", "default_fonts", "glow", "wayland", "x11"]}
 egui-file-dialog = "0.11.0"
-sqlite = "0.37.0"
+# sqlite = "0.37.0"
+
+[target.'cfg(not(target_arch = "wasm32"))'.dependencies]
+env_logger = "0.11.8"
+
+
+[target.'cfg(target_arch = "wasm32")'.dependencies]
+wasm-bindgen-futures = "0.4.50"
+web-sys = "0.3.77"
