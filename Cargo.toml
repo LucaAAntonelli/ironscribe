@@ -13,3 +13,9 @@ prost = "0.13"
 tonic-build = "0.13.1"
 tokio-stream = "0.1.17"
 tokio = { version = "1.23.1", features = ["rt-multi-thread", "fs"] }
+
+[profile.release]
+opt-level = 2
+
+[profile.dev.package."*"]
+opt-level = 2
