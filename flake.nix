@@ -68,6 +68,8 @@
                 xorg.libxcb
                 gcc
                 protobuf
+                trunk
+                cargo-tauri
               ];
               RUST_SRC_PATH = rustPlatform.rustLibSrc;
               LD_LIBRARY_PATH = libPath;
