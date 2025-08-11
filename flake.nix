@@ -68,8 +68,11 @@
                 xorg.libxcb
                 gcc
                 protobuf
-                trunk
-                cargo-tauri
+                dioxus-cli
+                xdotool
+                webkitgtk_6_0
+                wasm-bindgen-cli_0_2_100
+                lld_21
               ];
               RUST_SRC_PATH = rustPlatform.rustLibSrc;
               LD_LIBRARY_PATH = libPath;
