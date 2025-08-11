@@ -11,23 +11,6 @@ A server-client application for ebook syncing and management written in Rust
         - [ ] Book metadata
     - [ ] Analytics
 
-
-# Current Problems
-I'm trying to use the implementation of file transfer from [grpc-file-transfer-rust](https://github.com/optimumood/grpc-file-transfer-rust), and while the original project works, I haven't been able to adapt it to my use case fully. One problem is that the server gets flagged by some anti-malware software on my PC, whereas the original project still works without any problems. In addition to that, even though I'm using the exact same functions and implementations on client and server, the request and response somehow don't do anything for some reason. What I have noticed is that the original project requires you to specify the path of a client file split as the file name and the path to its folder because the path gets assembled in the call to upload, and the server needs an existing directory in order to accept the upload, i.e., if the server's folder doesn't exist, the request fails automatically. 
-
-# Current Tasks:
-- [ ] Port sync functionality from [here](https://github.com/FZambia/dirsync)
-  - [ ] Server
-  - [ ] Client
-- [ ] Once done, look for possible improvements
-  - [ ] Usage with ebook files -> folder structure likely similar to Calibre
-  - [ ] Books will likely be added either via GUI or by automatically copying from a specified folder, also similar to Calibre
-  - [ ] Because files will change only through GUI except previous point, no need for complex request-response for sync. Instead, create individual services for adding, editing and deleting
-- Look into short-comings of original repo, such as 
-    - not working on Windows file system
-    - only working from client to server, not bidirectionally
-    - only working with a single client (might be necessary for web access later)
-
 # Technical Planning
 The whole project is not only a fun endeavor for me, but also a deeper dive into learning Rust. As such, I'm planning to write this thing completely in Rust, with the tonic crate for gRPC and egui for the GUI. Since I'm taking heavy inspiration from both calibre and calibre-web, I'll also handle metadata with some sort of relational database. I'm still deciding between something lightweight and local like SQLite, just like calibre uses, or something more "high-end" like postgreSQL, which I'm already familiar with. 
 
@@ -57,3 +40,29 @@ Calibre-web doesn't offer multi-user support, at least not for all features. Sur
 
 ## Other Minor Short-Comings of Calibre-Web
 I hate hate *HATE* the fact that you have to manually reconnect calibre-web to the database file whenever you changed something. Is it really that big of a deal to let the service just check the database file every 30s for changes? Or have some file watchdog notify calibre-web when the metadata file changed? Also, why make it possible to mark books as read in the web UI but not in a way that is compatible with the underlying calibre database? Also, maybe add author pages that are customizable, at least with pictures and maybe a short biography. This one is a bonus though. 
+
+# Development
+
+Your new bare-bones project includes minimal organization with a single `main.rs` file and a few assets.
+
+```
+project/
+├─ assets/ # Any assets that are used by the app should be placed here
+├─ src/
+│  ├─ main.rs # main.rs is the entry point to your application and currently contains all components for the app
+├─ Cargo.toml # The Cargo.toml file defines the dependencies and feature flags for your project
+```
+
+### Serving Your App
+
+Run the following command in the root of your project to start developing with the default platform:
+
+```bash
+dx serve
+```
+
+To run for a different platform, use the `--platform platform` flag. E.g.
+```bash
+dx serve --platform desktop
+```
+
