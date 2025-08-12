@@ -42,29 +42,3 @@ Calibre-web doesn't offer multi-user support, at least not for all features. Sur
 
 ## Other Minor Short-Comings of Calibre-Web
 I hate hate *HATE* the fact that you have to manually reconnect calibre-web to the database file whenever you changed something. Is it really that big of a deal to let the service just check the database file every 30s for changes? Or have some file watchdog notify calibre-web when the metadata file changed? Also, why make it possible to mark books as read in the web UI but not in a way that is compatible with the underlying calibre database? Also, maybe add author pages that are customizable, at least with pictures and maybe a short biography. This one is a bonus though. 
-
-# Development
-
-Your new bare-bones project includes minimal organization with a single `main.rs` file and a few assets.
-
-```
-project/
-├─ assets/ # Any assets that are used by the app should be placed here
-├─ src/
-│  ├─ main.rs # main.rs is the entry point to your application and currently contains all components for the app
-├─ Cargo.toml # The Cargo.toml file defines the dependencies and feature flags for your project
-```
-
-### Serving Your App
-
-Run the following command in the root of your project to start developing with the default platform:
-
-```bash
-dx serve
-```
-
-To run for a different platform, use the `--platform platform` flag. E.g.
-```bash
-dx serve --platform desktop
-```
-
