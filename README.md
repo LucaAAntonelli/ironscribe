@@ -16,6 +16,7 @@ The whole project is not only a fun endeavor for me, but also a deeper dive into
 ## Database
 This is the current plan for the database schema (written based on Calibre's metadata SQLite file):
 ![Database Schema](./database_schema.svg)
+
 Since I'm not planning on porting all Calibre features, I'm also leaving out quite a few tables in the SQL database. 
 
 Since I'm taking heavy inspiration from both calibre and calibre-web, I'll also handle metadata with some sort of relational database. I'm still deciding between something lightweight and local like SQLite, just like calibre uses, or something more "high-end" like postgreSQL, which I'm already familiar with. 
