@@ -2,7 +2,6 @@
 A server-client application for ebook syncing and management written in Rust
 
 # Goals
-- [x] Look into a hybrid server that exposes gRPC and REST, as REST is apparently better usable on the web
 - [ ] Create different components
     - [ ] Folder sync
     - [ ] Client/Web GUI
@@ -13,6 +12,11 @@ A server-client application for ebook syncing and management written in Rust
 
 # Technical Planning
 The whole project is not only a fun endeavor for me, but also a deeper dive into learning Rust. As such, I'm planning to write this thing completely in Rust, with the tonic crate for gRPC and dioxus for the GUI. Initially, I'd planned on using egui for this purpose, but it seems like that library is not really suited for my plan because it requires you to have one single binary in order to run, but the WASM target for the web is incompatible with a lot of crates. With dioxus there's a clean split between frontend and backend, which doesn't have this problem. 
+
+## Database
+This is the current plan for the database schema (written based on Calibre's metadata SQLite file):
+![./database_schema.svg]
+Since I'm not planning on porting all Calibre features, I'm also leaving out quite a few tables in the SQL database. 
 
 Since I'm taking heavy inspiration from both calibre and calibre-web, I'll also handle metadata with some sort of relational database. I'm still deciding between something lightweight and local like SQLite, just like calibre uses, or something more "high-end" like postgreSQL, which I'm already familiar with. 
 
