@@ -5,6 +5,7 @@ thread_local! {
         let conn = rusqlite::Connection::open("hotdog.db").expect("Failed to open database");
 
         let sql = std::fs::read_to_string("schema.sql").expect("Failed to parse SQL schema file!");
+        conn.execute("PRAGMA foreign_keys = ONE", []).unwrap();
         conn.execute_batch(&sql).unwrap();
 
         conn
