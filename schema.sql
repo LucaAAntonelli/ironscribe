@@ -15,9 +15,9 @@ CREATE TABLE IF NOT EXISTS books (
     id INTEGER PRIMARY KEY,
     title TEXT NOT NULL,
     sort TEXT NOT NULL,
-    date_added TIMESTAMP NOT NULL,
+    date_added TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     date_published TIMESTAMP,
-    last_modified TIMESTAMP,
+    last_modified TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     number_of_pages INTEGER NOT NULL,
     goodreads_id INTEGER
 );
