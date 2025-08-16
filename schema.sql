@@ -9,7 +9,8 @@ CREATE TABLE IF NOT EXISTS authors (
     id INTEGER PRIMARY KEY,
     name TEXT NOT NULL COLLATE NOCASE,
     sort TEXT NOT NULL COLLATE NOCASE,
-    goodreads_id INTEGER
+    goodreads_id INTEGER,
+    UNIQUE(name)
 );
 CREATE TABLE IF NOT EXISTS books (
     id INTEGER PRIMARY KEY,
