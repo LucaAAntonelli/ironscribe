@@ -31,18 +31,18 @@ CREATE TABLE IF NOT EXISTS read_books (
     book INTEGER NOT NULL,
     start_date TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
     end_date TIMESTAMP,
-    FOREIGN KEY(book) REFERENCES books(id)
+    FOREIGN KEY(book) REFERENCES books(id) ON DELETE CASCADE
 );
 CREATE TABLE IF NOT EXISTS books_authors_link (
     book INTEGER NOT NULL,
     author INTEGER NOT NULL,
-    FOREIGN KEY(book) REFERENCES books(id),
-    FOREIGN KEY(author) REFERENCES authors(id)
+    FOREIGN KEY(book) REFERENCES books(id) ON DELETE CASCADE,
+    FOREIGN KEY(author) REFERENCES authors(id) ON DELETE CASCADE
 );
 CREATE TABLE IF NOT EXISTS books_series_link (
     book INTEGER NOT NULL,
     series INTEGER NOT NULL, 
     entry REAL NOT NULL,
-    FOREIGN KEY(book) REFERENCES books(id),
-    FOREIGN KEY(series) REFERENCES series(id)
+    FOREIGN KEY(book) REFERENCES books(id) ON DELETE CASCADE,
+    FOREIGN KEY(series) REFERENCES series(id) ON DELETE CASCADE
 );
