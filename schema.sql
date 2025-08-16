@@ -9,7 +9,7 @@ CREATE TABLE IF NOT EXISTS authors (
     id INTEGER PRIMARY KEY,
     name TEXT NOT NULL,
     sort TEXT NOT NULL,
-    goodreads_link TEXT
+    goodreads_id INTEGER
 );
 CREATE TABLE IF NOT EXISTS books (
     id INTEGER PRIMARY KEY,
@@ -19,12 +19,13 @@ CREATE TABLE IF NOT EXISTS books (
     date_published TIMESTAMP,
     last_modified TIMESTAMP,
     number_of_pages INTEGER NOT NULL,
-    goodreads_link TEXT
+    goodreads_id INTEGER
 );
 CREATE TABLE IF NOT EXISTS series (
     id INTEGER PRIMARY KEY,
     name TEXT NOT NULL,
     sort TEXT NOT NULL
+    goodreads_id INTEGER
 );
 CREATE TABLE IF NOT EXISTS read_books (
     book INTEGER NOT NULL,
