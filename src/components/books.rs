@@ -2,7 +2,7 @@ use dioxus::prelude::*;
 
 #[component]
 pub fn Books() -> Element {
-    let mut books = use_resource(crate::backend::list_books).suspend()?;
+    let books = use_resource(crate::backend::list_books).suspend()?;
 
     rsx! {
         div { id: "books",
