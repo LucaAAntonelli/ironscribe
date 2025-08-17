@@ -19,7 +19,9 @@ pub fn Books() -> Element {
                             td { "{title}" }
                             td { "{author}" }
                             td { "{series}" }
-                            td { "#{volume}" }
+                            td { if !volume.is_empty() {
+                                "#{volume}" }
+                            }
                         }
                     }
                 }
