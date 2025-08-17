@@ -177,3 +177,8 @@ th {
   position: sticky;
   top: 0;
 }
+
+tbody tr:nth-child(odd) {
+  background-color: #D1D1D1;
+  color: #000
+}
