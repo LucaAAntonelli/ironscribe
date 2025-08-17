@@ -16,14 +16,26 @@ pub fn Books() -> Element {
                         th {
                             "Author"
                         }
+                        th {
+                            "Series"
+                        }
+                        th {
+                            "Volume"
+                        }
                     }
-                    for (title, author) in books().unwrap() {
+                    for (title, author, series, volume) in books().unwrap() {
                         tr {
                             td {
                                 "{title}"
                             }
                             td {
                                 "{author}"
+                            }
+                            td {
+                                "{series}"
+                            }
+                            td {
+                                "#{volume}"
                             }
                         }
                     }
