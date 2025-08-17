@@ -32,3 +32,16 @@ pub async fn list_dogs() -> Result<Vec<(usize, String)>, ServerFnError> {
 
     Ok(dogs)
 }
+
+#[server]
+pub async fn list_books() -> Result<Vec<String>, ServerFnError> {
+    let books = DB.with(|f| {
+        f.prepare("SELECT title FROM books ORDER BY date_added ASC")
+            .unwrap()
+            .query_map([], |row| Ok(row.get(0)?))
+            .unwrap()
+            .map(|r| r.unwrap())
+            .collect()
+    });
+    Ok(books)
+}

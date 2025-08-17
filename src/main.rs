@@ -1,5 +1,6 @@
 mod backend;
 mod components;
+use components::Books;
 use components::Favorites;
 use components::NavBar;
 use dioxus::prelude::*;
@@ -21,6 +22,9 @@ enum Route {
 
     #[route("/favorites")]
     Favorites,
+
+    #[route("/books")]
+    Books,
 }
 
 fn main() {

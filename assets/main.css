@@ -148,3 +148,11 @@ a#heart {
     left: 10px;
     z-index: 10;
 }
+
+#books {
+    flex-grow: 1;
+    overflow: hidden;
+    display: flex;
+    flex-direction: column;
+    padding: 10px;
+}

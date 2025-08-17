@@ -11,6 +11,7 @@ pub fn NavBar() -> Element {
                 h1 { "🌭 HotDog!" }
             }
             Link { to: Route::Favorites, id: "heart", "♥️"}
+            Link { to: Route::Books, id: "book", ""}
         }
         Outlet::<Route> {}
     }
