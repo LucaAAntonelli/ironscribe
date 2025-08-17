@@ -7,7 +7,6 @@ pub fn Books() -> Element {
     rsx! {
         div { id: "books",
             div { id: "books-container",
-                    style: "overflow-y:auto",
                 table {
                     tr {
                         th { "Title" }

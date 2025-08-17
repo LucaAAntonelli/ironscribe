@@ -149,10 +149,31 @@ a#heart {
     z-index: 10;
 }
 
+
 #books {
-    flex-grow: 1;
-    overflow: hidden;
-    display: flex;
-    flex-direction: column;
-    padding: 10px;
+  flex-grow: 1;
+  overflow: hidden;       /* parent doesn't scroll */
+  display: flex;
+  flex-direction: column;
+  padding: 10px;
+  min-height: 0;          /* important for scrollable flex children */
+}
+
+#books-container {
+  flex: 1 1 auto;         /* fill remaining space */
+  min-height: 0;          /* allow scrolling instead of forcing overflow */
+  overflow-y: auto;       /* the scroll happens here */
+  /* optional: set a max-height if you prefer a capped area */
+  /* max-height: 60vh; */
+}
+
+table {
+  text-align: left;
+  position: relative;
+}
+
+th {
+  background: #000;
+  position: sticky;
+  top: 0;
 }
