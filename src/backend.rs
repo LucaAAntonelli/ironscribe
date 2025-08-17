@@ -34,11 +34,11 @@ pub async fn list_dogs() -> Result<Vec<(usize, String)>, ServerFnError> {
 }
 
 #[server]
-pub async fn list_books() -> Result<Vec<String>, ServerFnError> {
+pub async fn list_books() -> Result<Vec<(String, String)>, ServerFnError> {
     let books = DB.with(|f| {
-        f.prepare("SELECT title FROM books ORDER BY date_added ASC")
+        f.prepare("SELECT b.title, a.name FROM books b JOIN books_authors_link bal ON bal.book = b.id JOIN authors a ON a.id = bal.author ORDER BY b.date_added ASC")
             .unwrap()
-            .query_map([], |row| Ok(row.get(0)?))
+            .query_map([], |row| Ok((row.get(0)?, row.get(1)?)))
             .unwrap()
             .map(|r| r.unwrap())
             .collect()
