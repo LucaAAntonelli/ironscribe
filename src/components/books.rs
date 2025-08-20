@@ -1,4 +1,5 @@
 use dioxus::prelude::*;
+use itertools::Itertools;
 
 #[component]
 pub fn Books() -> Element {
@@ -13,11 +14,11 @@ pub fn Books() -> Element {
                         th { "Author" }
                         th { "Series & Volume" }
                     }
-                    for (title, author, series_and_volume) in books().unwrap() {
+                    for book in books().unwrap() {
                         tr {
-                            td { "{title}" }
-                            td { "{author}" }
-                            td { "{series_and_volume}" }
+                            td { "{book.get_title()}" }
+                            td { "{book.get_authors().join(\", \")}" }
+                            td { "{book.get_series_and_volumes().iter().join(\", \")}" }
                         }
                     }
                 }

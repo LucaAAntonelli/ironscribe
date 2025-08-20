@@ -1,15 +1,40 @@
-use dioxus::prelude::*;
+use std::fmt::Display;
 
-struct BookRecord {
+use dioxus::prelude::*;
+use serde::{Deserialize, Serialize};
+
+#[derive(Serialize, Deserialize, Clone)]
+pub struct BookRecord {
     book_id: usize,
     title: String,
     authors: Vec<String>,
     series_and_volume: Vec<SeriesAndVolume>,
 }
 
-struct SeriesAndVolume {
+#[derive(Serialize, Deserialize, Clone)]
+pub struct SeriesAndVolume {
     series: String,
     volume: f64,
+}
+
+impl Display for SeriesAndVolume {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        write!(f, "{} #{}", self.series, self.volume)
+    }
+}
+
+impl BookRecord {
+    pub fn get_title(&self) -> String {
+        self.title.clone()
+    }
+
+    pub fn get_authors(&self) -> Vec<String> {
+        self.authors.clone()
+    }
+
+    pub fn get_series_and_volumes(&self) -> Vec<SeriesAndVolume> {
+        self.series_and_volume.clone()
+    }
 }
 
 #[cfg(feature = "server")]
@@ -47,7 +72,7 @@ pub async fn list_dogs() -> Result<Vec<(usize, String)>, ServerFnError> {
 }
 
 #[server]
-pub async fn list_books() -> Result<Vec<(String, String, String)>, ServerFnError> {
+pub async fn list_books() -> Result<Vec<BookRecord>, ServerFnError> {
     let books = DB.with(|f| {
         f.prepare(
             "
@@ -79,7 +104,7 @@ pub async fn list_books() -> Result<Vec<(String, String, String)>, ServerFnError
                 * 
             FROM 
                 books 
-                JOIN series_info ON series_info.book = books.id 
+                LEFT JOIN series_info ON series_info.book = books.id 
                 JOIN authors_info ON authors_info.book = books.id 
             ORDER BY 
                 books.date_added ASC
@@ -88,11 +113,14 @@ pub async fn list_books() -> Result<Vec<(String, String, String)>, ServerFnError
         )
         .unwrap()
         .query_map([], |row| {
-            Ok((
-                row.get("title")?,
-                row.get("authors")?,
-                row.get("series_and_volume").unwrap_or_default(),
-            ))
+            let authors_json_str: String = row.get("authors")?;
+            let series_json_str: String = row.get("series_and_volume").unwrap_or_default();
+            Ok(BookRecord {
+                book_id: /* row.get("book")?, */ 0,
+                title: row.get("title")?,
+                authors: serde_json::from_str(&authors_json_str).unwrap(),
+                series_and_volume: serde_json::from_str(&series_json_str).unwrap_or(vec![]),
+            })
         })
         .unwrap()
         .map(|r| r.unwrap())
