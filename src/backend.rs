@@ -49,28 +49,51 @@ pub async fn list_dogs() -> Result<Vec<(usize, String)>, ServerFnError> {
 #[server]
 pub async fn list_books() -> Result<Vec<(String, String, String)>, ServerFnError> {
     let books = DB.with(|f| {
-        f.prepare("
-            WITH 
-                series_info AS (
-                    SELECT bsl.book, json_group_array(json_object('series', s.name, 'volume', bsl.entry)) series_and_volume 
-                    FROM series AS s 
+        f.prepare(
+            "
+            WITH series_info AS (
+                SELECT 
+                    bsl.book, 
+                    json_group_array(
+                        json_object(
+                            'series', s.name, 'volume', bsl.entry
+                        )
+                    ) series_and_volume 
+                FROM 
+                    series AS s 
                     JOIN books_series_link bsl ON bsl.series = s.id 
-                    GROUP BY bsl.book
-                ), 
-                authors_info AS (
-                    SELECT json_group_array(a.name) authors, bal.book 
-                    FROM authors AS a 
+                GROUP BY 
+                    bsl.book
+            ), 
+            authors_info AS (
+                SELECT 
+                    json_group_array(a.name) authors, 
+                    bal.book 
+                FROM 
+                    authors AS a 
                     JOIN books_authors_link bal ON a.id = bal.author 
-                    GROUP BY bal.book
-                ) 
-            SELECT * 
-            FROM books
-            JOIN series_info ON series_info.book = books.id 
-            JOIN authors_info ON authors_info.book = books.id 
-            ORDER BY books.date_added ASC
-        ")
+                GROUP BY 
+                    bal.book
+            ) 
+            SELECT 
+                * 
+            FROM 
+                books 
+                JOIN series_info ON series_info.book = books.id 
+                JOIN authors_info ON authors_info.book = books.id 
+            ORDER BY 
+                books.date_added ASC
+
+        ",
+        )
         .unwrap()
-        .query_map([], |row| Ok((row.get("title")?, row.get("authors")?, row.get("series_and_volume").unwrap_or_default())))
+        .query_map([], |row| {
+            Ok((
+                row.get("title")?,
+                row.get("authors")?,
+                row.get("series_and_volume").unwrap_or_default(),
+            ))
+        })
         .unwrap()
         .map(|r| r.unwrap())
         .collect()
