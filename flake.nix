@@ -70,9 +70,19 @@
                 protobuf
                 dioxus-cli
                 xdotool
-                webkitgtk_6_0
                 wasm-bindgen-cli_0_2_100
                 lld_21
+                at-spi2-atk
+                atkmm
+                cairo
+                gdk-pixbuf
+                glib
+                gtk3
+                harfbuzz
+                librsvg
+                libsoup_3
+                pango
+                webkitgtk_4_1
               ];
               RUST_SRC_PATH = rustPlatform.rustLibSrc;
               LD_LIBRARY_PATH = libPath;
