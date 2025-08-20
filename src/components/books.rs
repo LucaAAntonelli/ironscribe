@@ -11,17 +11,13 @@ pub fn Books() -> Element {
                     tr {
                         th { "Title" }
                         th { "Author" }
-                        th { "Series" }
-                        th { "Volume" }
+                        th { "Series & Volume" }
                     }
-                    for (title, author, series, volume) in books().unwrap() {
+                    for (title, author, series_and_volume) in books().unwrap() {
                         tr {
                             td { "{title}" }
                             td { "{author}" }
-                            td { "{series}" }
-                            td { if !volume.is_empty() {
-                                "#{volume}" }
-                            }
+                            td { "{series_and_volume}" }
                         }
                     }
                 }
