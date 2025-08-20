@@ -14,6 +14,7 @@ pub struct BookRecord {
 #[derive(Serialize, Deserialize, Clone)]
 pub struct SeriesAndVolume {
     series: String,
+    sort: String,
     volume: f64,
 }
 
@@ -81,7 +82,7 @@ pub async fn list_books() -> Result<Vec<BookRecord>, ServerFnError> {
                     bsl.book, 
                     json_group_array(
                         json_object(
-                            'series', s.name, 'volume', bsl.entry
+                            'series', s.name, 'sort', s.sort, 'volume', bsl.entry
                         )
                     ) series_and_volume 
                 FROM 
@@ -101,14 +102,13 @@ pub async fn list_books() -> Result<Vec<BookRecord>, ServerFnError> {
                     bal.book
             ) 
             SELECT 
-                * 
+                id, title, sort, date_added, date_published, last_modified, number_of_pages, goodreads_id, authors, series_and_volume 
             FROM 
                 books 
                 LEFT JOIN series_info ON series_info.book = books.id 
                 JOIN authors_info ON authors_info.book = books.id 
             ORDER BY 
                 books.date_added ASC
-
         ",
         )
         .unwrap()
@@ -116,7 +116,7 @@ pub async fn list_books() -> Result<Vec<BookRecord>, ServerFnError> {
             let authors_json_str: String = row.get("authors")?;
             let series_json_str: String = row.get("series_and_volume").unwrap_or_default();
             Ok(BookRecord {
-                book_id: /* row.get("book")?, */ 0,
+                book_id: row.get("id")?,
                 title: row.get("title")?,
                 authors: serde_json::from_str(&authors_json_str).unwrap(),
                 series_and_volume: serde_json::from_str(&series_json_str).unwrap_or(vec![]),
