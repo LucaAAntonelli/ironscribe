@@ -1,3 +1,4 @@
+use chrono::{DateTime, NaiveDateTime, Utc};
 use std::fmt::Display;
 
 use dioxus::prelude::*;
@@ -7,8 +8,14 @@ use serde::{Deserialize, Serialize};
 pub struct BookRecord {
     book_id: usize,
     title: String,
+    sort: String,
     authors: Vec<String>,
     series_and_volume: Vec<SeriesAndVolume>,
+    number_of_pages: u32,
+    goodreads_id: u64,
+    date_added: DateTime<Utc>,
+    date_published: DateTime<Utc>,
+    date_modified: DateTime<Utc>,
 }
 
 #[derive(Serialize, Deserialize, Clone)]
@@ -118,8 +125,15 @@ pub async fn list_books() -> Result<Vec<BookRecord>, ServerFnError> {
             Ok(BookRecord {
                 book_id: row.get("id")?,
                 title: row.get("title")?,
+                sort: row.get("sort")?,
                 authors: serde_json::from_str(&authors_json_str).unwrap(),
                 series_and_volume: serde_json::from_str(&series_json_str).unwrap_or(vec![]),
+                number_of_pages: row.get("number_of_pages")?,
+                date_added: row.get("date_added")?,
+                date_published: row.get("date_published")?,
+                date_modified: row.get("last_modified")?,
+                goodreads_id: row.get("goodreads_id")?,
+
             })
         })
         .unwrap()
