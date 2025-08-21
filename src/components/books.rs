@@ -9,18 +9,23 @@ pub fn Books() -> Element {
         div { id: "books",
             div { id: "books-container",
                 table {
-                    tr {
-                        th { "Title" }
-                        th { "Author" }
-                        th { "Series & Volume" }
-                    }
-                    for book in books().unwrap() {
+                    thead {
                         tr {
-                            td { "{book.get_title()}" }
-                            td { "{book.get_authors().join(\", \")}" }
-                            td { "{book.get_series_and_volumes().iter().join(\", \")}" }
+                            th { onclick: move |event| tracing::info!("Clicked Title Header"), "Title" }
+                            th { onclick: move |event| tracing::info!("Clicked Author Header"), "Author"}
+                            th { onclick: move |event| tracing::info!("Clicked Series & Volume Header"), "Series & Volume" }
                         }
                     }
+                    tbody {
+                        for book in books().unwrap() {
+                            tr {
+                                td { "{book.get_title()}" }
+                                td { "{book.get_authors().join(\", \")}" }
+                                td { "{book.get_series_and_volumes().iter().join(\", \")}" }
+                            }
+                        }
+                    }
+
                 }
             }
         }
