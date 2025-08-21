@@ -177,6 +177,7 @@ th {
   color: #D1D1D1;
   position: sticky;
   top: 0;
+  user-select: none /* disable text select/cursor change on table header rows */
 }
 
 tbody tr:nth-child(odd) {
