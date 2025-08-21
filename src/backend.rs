@@ -8,22 +8,31 @@ use serde::{Deserialize, Serialize};
 pub struct BookRecord {
     book_id: usize,
     title: String,
-    sort: String,
+    pub sort: String,
     authors: Vec<String>,
-    authors_sort: Vec<String>,
-    series_and_volume: Vec<SeriesAndVolume>,
+    pub authors_sort: Vec<String>,
+    pub series_and_volume: Vec<SeriesAndVolume>,
     number_of_pages: u32,
     goodreads_id: u64,
-    date_added: DateTime<Utc>,
-    date_published: DateTime<Utc>,
+    pub date_added: DateTime<Utc>,
+    pub date_published: DateTime<Utc>,
     date_modified: DateTime<Utc>,
 }
 
 #[derive(Serialize, Deserialize, Clone)]
 pub struct SeriesAndVolume {
     series: String,
-    sort: String,
+    pub sort: String,
     volume: f64,
+}
+
+#[derive(PartialEq, Clone)]
+pub enum SortKey {
+    Title,
+    Author,
+    SeriesAndVolume,
+    DateAdded,
+    DatePublished,
 }
 
 impl Display for SeriesAndVolume {
@@ -44,6 +53,27 @@ impl BookRecord {
     pub fn get_series_and_volumes(&self) -> Vec<SeriesAndVolume> {
         self.series_and_volume.clone()
     }
+}
+
+pub fn sort_books(
+    books: &mut Vec<BookRecord>,
+    sort_key: SortKey,
+    ascending: bool,
+) -> Vec<BookRecord> {
+    books.sort_by_key(|k| match sort_key {
+        SortKey::Title => k.sort.clone(),
+        SortKey::Author => k.authors_sort[0].clone(),
+        SortKey::SeriesAndVolume => k
+            .series_and_volume
+            .first()
+            .map_or(String::from(""), |sv| sv.sort.clone()),
+        SortKey::DateAdded => k.date_added.to_rfc3339(),
+        SortKey::DatePublished => k.date_published.to_rfc3339(),
+    });
+    if !ascending {
+        books.reverse();
+    }
+    books.to_owned()
 }
 
 #[cfg(feature = "server")]
