@@ -170,17 +170,23 @@ a#heart {
 table {
   text-align: left;
   position: relative;
+  background: #a6a9b5
+  color: #FFFFFF
 }
 
 th {
-  background: #000;
-  color: #D1D1D1;
+  background: #707070;
+  color: #FFFFFF;
   position: sticky;
   top: 0;
   user-select: none /* disable text select/cursor change on table header rows */
 }
 
+tbody {
+  background-color: #707070;
+}
+
 tbody tr:nth-child(odd) {
-  background-color: #D1D1D1;
-  color: #000
+  background-color: #000000;
+  color: #FFFFFF
 }
