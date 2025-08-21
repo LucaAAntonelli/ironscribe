@@ -10,6 +10,7 @@ pub struct BookRecord {
     title: String,
     sort: String,
     authors: Vec<String>,
+    authors_sort: Vec<String>,
     series_and_volume: Vec<SeriesAndVolume>,
     number_of_pages: u32,
     goodreads_id: u64,
@@ -101,6 +102,7 @@ pub async fn list_books() -> Result<Vec<BookRecord>, ServerFnError> {
             authors_info AS (
                 SELECT 
                     json_group_array(a.name) authors, 
+                    json_group_array(a.sort) authors_sort,
                     bal.book 
                 FROM 
                     authors AS a 
@@ -109,7 +111,7 @@ pub async fn list_books() -> Result<Vec<BookRecord>, ServerFnError> {
                     bal.book
             ) 
             SELECT 
-                id, title, sort, date_added, date_published, last_modified, number_of_pages, goodreads_id, authors, series_and_volume 
+                id, title, sort, date_added, date_published, last_modified, number_of_pages, goodreads_id, authors, authors_sort, series_and_volume 
             FROM 
                 books 
                 LEFT JOIN series_info ON series_info.book = books.id 
@@ -121,12 +123,14 @@ pub async fn list_books() -> Result<Vec<BookRecord>, ServerFnError> {
         .unwrap()
         .query_map([], |row| {
             let authors_json_str: String = row.get("authors")?;
+            let authors_sort_json_str: String = row.get("authors_sort")?;
             let series_json_str: String = row.get("series_and_volume").unwrap_or_default();
             Ok(BookRecord {
                 book_id: row.get("id")?,
                 title: row.get("title")?,
                 sort: row.get("sort")?,
                 authors: serde_json::from_str(&authors_json_str).unwrap(),
+                authors_sort: serde_json::from_str(&authors_sort_json_str).unwrap(),
                 series_and_volume: serde_json::from_str(&series_json_str).unwrap_or(vec![]),
                 number_of_pages: row.get("number_of_pages")?,
                 date_added: row.get("date_added")?,
