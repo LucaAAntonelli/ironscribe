@@ -11,9 +11,9 @@ pub fn Books() -> Element {
                 table {
                     thead {
                         tr {
-                            th { onclick: move |event| tracing::info!("Clicked Title Header"), "Title" }
-                            th { onclick: move |event| tracing::info!("Clicked Author Header"), "Author"}
-                            th { onclick: move |event| tracing::info!("Clicked Series & Volume Header"), "Series & Volume" }
+                            th { onclick: move |event| tracing::info!("Clicked Title"), "Title" }
+                            th { onclick: move |event| tracing::info!("Clicked Author"), "Author"}
+                            th { onclick: move |event| tracing::info!("Clicked Series & Volume"), "Series & Volume" }
                         }
                     }
                     tbody {
