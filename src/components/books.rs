@@ -1,6 +1,19 @@
 use dioxus::prelude::*;
 use itertools::Itertools;
 
+enum SortKey {
+    Title,
+    Author,
+    SeriesAndVolume,
+    DateAdded,
+    DatePublished,
+}
+
+struct SortState {
+    key: SortKey,
+    ascending: bool,
+}
+
 #[component]
 pub fn Books() -> Element {
     let books = use_server_future(crate::backend::list_books)?;
