@@ -1,5 +1,5 @@
 use chrono::{DateTime, NaiveDateTime, Utc};
-use std::fmt::Display;
+use std::{cmp::Ordering, fmt::Display};
 
 use dioxus::prelude::*;
 use serde::{Deserialize, Serialize};
@@ -60,15 +60,24 @@ pub fn sort_books(
     sort_key: SortKey,
     ascending: bool,
 ) -> Vec<BookRecord> {
-    books.sort_by_key(|k| match sort_key {
-        SortKey::Title => k.sort.clone(),
-        SortKey::Author => k.authors_sort[0].clone(),
-        SortKey::SeriesAndVolume => k
-            .series_and_volume
-            .first()
-            .map_or(String::from(""), |sv| sv.sort.clone()),
-        SortKey::DateAdded => k.date_added.to_rfc3339(),
-        SortKey::DatePublished => k.date_published.to_rfc3339(),
+    books.sort_by(|a, b| match sort_key {
+        SortKey::Title => a.sort.cmp(&b.sort),
+        SortKey::Author => a.authors_sort[0].cmp(&b.authors_sort[0]),
+        SortKey::SeriesAndVolume => {
+            match (a.series_and_volume.first(), b.series_and_volume.first()) {
+                (Some(sa), Some(sb)) => {
+                    // Both records have a series
+                    sa.sort
+                        .cmp(&sb.sort)
+                        .then_with(|| sa.volume.total_cmp(&sb.volume))
+                }
+                (None, Some(_)) => Ordering::Less,
+                (Some(_), None) => Ordering::Greater,
+                (None, None) => Ordering::Equal,
+            }
+        }
+        SortKey::DateAdded => a.date_added.cmp(&b.date_added),
+        SortKey::DatePublished => a.date_published.cmp(&b.date_published),
     });
     if !ascending {
         books.reverse();
