@@ -59,6 +59,12 @@ pub fn Books() -> Element {
                                             write.key = SortKey::NumberOfPages;
                                             write.ascending = !write.ascending;
                                         }, "Number of Pages" }
+                                        th { onclick: move |_| {
+                                            tracing::info!("Date Added clicked!");
+                                            let mut write = sort_state.write();
+                                            write.key = SortKey::DateAdded;
+                                            write.ascending = !write.ascending;
+                                        }, "Date Added" }
                                     }
                                 }
                                 tbody {
@@ -68,6 +74,7 @@ pub fn Books() -> Element {
                                             td { "{book.get_authors().join(\", \")}" }
                                             td { "{book.get_series_and_volumes().iter().join(\", \")}" }
                                             td { "{book.get_pages()}" }
+                                            td { "{book.get_date_added()}" }
                                         }
                                     }
                                 }
