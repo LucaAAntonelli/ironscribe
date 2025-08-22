@@ -29,7 +29,7 @@ pub fn Books() -> Element {
                     },
                     Some(Ok(books)) =>  {
                         let mut sorted = books.clone();
-                        sorted = sort_books(&mut sorted, sort_state.read().key.clone(), sort_state.read().ascending);
+                        sorted.sort(sort_state.read().key.clone(), sort_state.read().ascending);
 
                         rsx! {
                             table {
@@ -74,7 +74,7 @@ pub fn Books() -> Element {
                                     }
                                 }
                                 tbody {
-                                    for book in sorted {
+                                    for book in sorted.records {
                                         tr {
                                             td { "{book.get_title()}" }
                                             td { "{book.get_authors().join(\", \")}" }
