@@ -12,7 +12,7 @@ pub struct BookRecord {
     authors: Vec<String>,
     pub authors_sort: Vec<String>,
     pub series_and_volume: Vec<SeriesAndVolume>,
-    number_of_pages: u32,
+    pub number_of_pages: u32,
     goodreads_id: u64,
     pub date_added: DateTime<Utc>,
     pub date_published: DateTime<Utc>,
@@ -33,6 +33,7 @@ pub enum SortKey {
     SeriesAndVolume,
     DateAdded,
     DatePublished,
+    NumberOfPages,
 }
 
 impl Display for SeriesAndVolume {
@@ -52,6 +53,18 @@ impl BookRecord {
 
     pub fn get_series_and_volumes(&self) -> Vec<SeriesAndVolume> {
         self.series_and_volume.clone()
+    }
+
+    pub fn get_pages(&self) -> u32 {
+        self.number_of_pages
+    }
+
+    pub fn get_date_added(&self) -> DateTime<Utc> {
+        self.date_added
+    }
+
+    pub fn get_date_published(&self) -> DateTime<Utc> {
+        self.date_published
     }
 }
 
@@ -78,6 +91,7 @@ pub fn sort_books(
         }
         SortKey::DateAdded => a.date_added.cmp(&b.date_added),
         SortKey::DatePublished => a.date_published.cmp(&b.date_published),
+        SortKey::NumberOfPages => a.number_of_pages.cmp(&b.number_of_pages),
     });
     if !ascending {
         books.reverse();
