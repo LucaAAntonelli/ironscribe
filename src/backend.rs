@@ -42,21 +42,21 @@ impl BookRecords {
 pub struct BookRecord {
     book_id: usize,
     title: String,
-    pub sort: String,
+    sort: String,
     authors: Vec<String>,
-    pub authors_sort: Vec<String>,
-    pub series_and_volume: Vec<SeriesAndVolume>,
-    pub number_of_pages: u32,
+    authors_sort: Vec<String>,
+    series_and_volume: Vec<SeriesAndVolume>,
+    number_of_pages: u32,
     goodreads_id: u64,
-    pub date_added: DateTime<Utc>,
-    pub date_published: DateTime<Utc>,
+    date_added: DateTime<Utc>,
+    date_published: DateTime<Utc>,
     date_modified: DateTime<Utc>,
 }
 
 #[derive(Serialize, Deserialize, Clone)]
 pub struct SeriesAndVolume {
     series: String,
-    pub sort: String,
+    sort: String,
     volume: f64,
 }
 

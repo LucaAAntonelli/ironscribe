@@ -1,7 +1,7 @@
 use dioxus::prelude::*;
 use itertools::Itertools;
 
-use crate::backend::{sort_books, SortKey};
+use crate::backend::SortKey;
 
 struct SortState {
     key: SortKey,
