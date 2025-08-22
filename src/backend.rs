@@ -1,4 +1,4 @@
-use chrono::{DateTime, NaiveDateTime, Utc};
+use chrono::{DateTime, Utc};
 use std::{cmp::Ordering, fmt::Display};
 
 use dioxus::prelude::*;
@@ -100,37 +100,6 @@ impl BookRecord {
     pub fn get_date_published(&self) -> DateTime<Utc> {
         self.date_published
     }
-}
-
-pub fn sort_books(
-    books: &mut Vec<BookRecord>,
-    sort_key: SortKey,
-    ascending: bool,
-) -> Vec<BookRecord> {
-    books.sort_by(|a, b| match sort_key {
-        SortKey::Title => a.sort.cmp(&b.sort),
-        SortKey::Author => a.authors_sort[0].cmp(&b.authors_sort[0]),
-        SortKey::SeriesAndVolume => {
-            match (a.series_and_volume.first(), b.series_and_volume.first()) {
-                (Some(sa), Some(sb)) => {
-                    // Both records have a series
-                    sa.sort
-                        .cmp(&sb.sort)
-                        .then_with(|| sa.volume.total_cmp(&sb.volume))
-                }
-                (None, Some(_)) => Ordering::Less,
-                (Some(_), None) => Ordering::Greater,
-                (None, None) => Ordering::Equal,
-            }
-        }
-        SortKey::DateAdded => a.date_added.cmp(&b.date_added),
-        SortKey::DatePublished => a.date_published.cmp(&b.date_published),
-        SortKey::NumberOfPages => a.number_of_pages.cmp(&b.number_of_pages),
-    });
-    if !ascending {
-        books.reverse();
-    }
-    books.to_owned()
 }
 
 #[cfg(feature = "server")]
