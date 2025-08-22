@@ -22,10 +22,10 @@ pub fn Books() -> Element {
             div { id: "books-container",
                 match books() {
                     Some(Err(e)) => rsx! {
-                        tr {td { colspan: "3", "Error: {e}"}}
+                        div { "Error: {e}" }
                     },
                     None => rsx! {
-                        tr {td { colspan: "3", "Loading..."}}
+                        div { "Loading..." }
                     },
                     Some(Ok(books)) =>  {
                         let mut sorted = books.clone();
