@@ -20,9 +20,8 @@ fn main() {
 fn App() -> Element {
     rsx! {
         document::Stylesheet { href: MAIN_CSS }
-        document::Link { rel: "icon", href: FAVICON}
+        document::Link { rel: "icon", href: FAVICON }
 
         Router::<Route> {}
-
     }
 }

@@ -27,50 +27,67 @@ pub fn Books() -> Element {
                     None => rsx! {
                         div { "Loading..." }
                     },
-                    Some(Ok(books)) =>  {
+                    Some(Ok(books)) => {
                         let mut sorted = books.clone();
                         sorted.sort(sort_state.read().key.clone(), sort_state.read().ascending);
-
                         rsx! {
                             table {
                                 thead {
                                     tr {
-                                        th { onclick: move |_| {
-                                            tracing::info!("Title clicked!");
-                                            let mut write = sort_state.write();
-                                            write.key = SortKey::Title;
-                                            write.ascending = !write.ascending;
-                                        }, "Title" }
-                                        th { onclick: move |_| {
-                                            tracing::info!("Author clicked!");
-                                            let mut write = sort_state.write();
-                                            write.key = SortKey::Author;
-                                            write.ascending = !write.ascending;
-                                        }, "Author" }
-                                        th { onclick: move |_| {
-                                            tracing::info!("Series & Volume clicked!");
-                                            let mut write = sort_state.write();
-                                            write.key = SortKey::SeriesAndVolume;
-                                            write.ascending = !write.ascending;
-                                        }, "Series & Volume" }
-                                        th { onclick: move |_| {
-                                            tracing::info!("Number of pages clicked!");
-                                            let mut write = sort_state.write();
-                                            write.key = SortKey::NumberOfPages;
-                                            write.ascending = !write.ascending;
-                                        }, "Number of Pages" }
-                                        th { onclick: move |_| {
-                                            tracing::info!("Date Added clicked!");
-                                            let mut write = sort_state.write();
-                                            write.key = SortKey::DateAdded;
-                                            write.ascending = !write.ascending;
-                                        }, "Date Added" }
-                                        th { onclick: move |_| {
-                                            tracing::info!("Date Published clicked!");
-                                            let mut write = sort_state.write();
-                                            write.key = SortKey::DatePublished;
-                                            write.ascending = !write.ascending;
-                                        }, "Date Published" }
+                                        th {
+                                            onclick: move |_| {
+                                                tracing::info!("Title clicked!");
+                                                let mut write = sort_state.write();
+                                                write.key = SortKey::Title;
+                                                write.ascending = !write.ascending;
+                                            },
+                                            "Title"
+                                        }
+                                        th {
+                                            onclick: move |_| {
+                                                tracing::info!("Author clicked!");
+                                                let mut write = sort_state.write();
+                                                write.key = SortKey::Author;
+                                                write.ascending = !write.ascending;
+                                            },
+                                            "Author"
+                                        }
+                                        th {
+                                            onclick: move |_| {
+                                                tracing::info!("Series & Volume clicked!");
+                                                let mut write = sort_state.write();
+                                                write.key = SortKey::SeriesAndVolume;
+                                                write.ascending = !write.ascending;
+                                            },
+                                            "Series & Volume"
+                                        }
+                                        th {
+                                            onclick: move |_| {
+                                                tracing::info!("Number of pages clicked!");
+                                                let mut write = sort_state.write();
+                                                write.key = SortKey::NumberOfPages;
+                                                write.ascending = !write.ascending;
+                                            },
+                                            "Number of Pages"
+                                        }
+                                        th {
+                                            onclick: move |_| {
+                                                tracing::info!("Date Added clicked!");
+                                                let mut write = sort_state.write();
+                                                write.key = SortKey::DateAdded;
+                                                write.ascending = !write.ascending;
+                                            },
+                                            "Date Added"
+                                        }
+                                        th {
+                                            onclick: move |_| {
+                                                tracing::info!("Date Published clicked!");
+                                                let mut write = sort_state.write();
+                                                write.key = SortKey::DatePublished;
+                                                write.ascending = !write.ascending;
+                                            },
+                                            "Date Published"
+                                        }
                                     }
                                 }
                                 tbody {
