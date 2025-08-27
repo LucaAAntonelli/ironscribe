@@ -1,6 +1,8 @@
 mod backend;
 mod components;
+mod config;
 use components::Books;
+use config::init_config;
 use dioxus::prelude::*;
 
 const FAVICON: Asset = asset!("/assets/favicon.ico");
@@ -13,6 +15,7 @@ enum Route {
 }
 
 fn main() {
+    init_config();
     dioxus::launch(App);
 }
 
