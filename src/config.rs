@@ -1,6 +1,5 @@
 use directories::ProjectDirs;
 use std::fs::{create_dir_all, File};
-use std::path::Path;
 
 pub fn init_config() {
     // Create app's OS-specific config directories
