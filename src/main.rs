@@ -14,12 +14,20 @@ enum Route {
     Books,
 }
 
+#[cfg(target_arch = "wasm32")]
 fn main() {
-    if let Ok(result) = init_config() {
-        if result {
-            dioxus::launch(App);
-        }
+    dioxus::launch(App);
+}
+
+#[cfg(not(target_arch = "wasm32"))]
+fn main() {
+    if let Err(e) = init_config() {
+        eprintln!("fatal: {e}");
+        std::process::exit(1); // exit with non-zero exit code
+    } else {
+        println!("Successfully created config folder and file");
     }
+    dioxus::launch(App);
 }
 
 #[component]
