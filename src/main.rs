@@ -15,8 +15,11 @@ enum Route {
 }
 
 fn main() {
-    init_config();
-    dioxus::launch(App);
+    if let Ok(result) = init_config() {
+        if result {
+            dioxus::launch(App);
+        }
+    }
 }
 
 #[component]
