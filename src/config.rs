@@ -24,9 +24,11 @@ pub fn init_config() -> anyhow::Result<Config> {
             // If file existed before, it may contain values already
             let content =
                 std::fs::read_to_string(config_file_path).context("failed to read config file!")?;
-            let config: Config = serde_json::from_str(&content)
-                .context("failed to parse file content to Config object!")?;
-            return Ok(config); // config may still not contain path here!
+            if let Ok(config) = serde_json::from_str(&content) {
+                return Ok(config); // config contains a path here
+            } else {
+                return Ok(Config { data_dir: None });
+            }
         } else {
             // File doesn't exist yet -> need to create and will not contain values yet
             File::create(config_file_path)?;
