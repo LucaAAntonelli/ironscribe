@@ -15,13 +15,16 @@ enum Route {
 }
 
 fn main() {
-    #[cfg(not(target_arch = "wasm32"))]
+    #[cfg(feature = "server")]
     {
-        if let Err(e) = init_config() {
-            eprintln!("fatal: {e}");
-            std::process::exit(1); // exit with non-zero exit code
-        } else {
-            println!("Successfully created config folder and file");
+        match init_config() {
+            Ok(config) => {
+                dbg!(config);
+            }
+            Err(e) => {
+                eprintln!("fatal: {e}");
+                std::process::exit(1);
+            }
         }
     }
     dioxus::launch(App);
