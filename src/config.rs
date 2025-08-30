@@ -1,13 +1,8 @@
+#![cfg(feature = "server")]
+use crate::types::Config;
 use anyhow::{anyhow, Context};
 use directories::ProjectDirs;
-use serde::{Deserialize, Serialize};
 use std::fs::{create_dir_all, File};
-use std::path::PathBuf;
-
-#[derive(Serialize, Deserialize, Debug)]
-pub struct Config {
-    pub data_dir: Option<PathBuf>,
-}
 
 pub fn init_config() -> anyhow::Result<Config> {
     // Create app's OS-specific config directories
