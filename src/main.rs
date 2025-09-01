@@ -30,6 +30,17 @@ fn main() {
 
 #[component]
 fn App() -> Element {
+    // Toggles whether dialog shows up or not
+    let mut show = use_signal(|| true);
+    // Used to commit text box input in one go
+    let mut committed = use_signal(|| String::new());
+    // this is called every time committed changes
+    use_effect({
+        move || {
+            tracing::info!("[committed changed]: {}", committed());
+        }
+    });
+
     let cfg = use_server_future(get_config)?;
     match cfg() {
         Some(Ok(config)) => tracing::info!("Found config: {:?}", config),
@@ -41,5 +52,90 @@ fn App() -> Element {
         document::Link { rel: "icon", href: FAVICON }
 
         Router::<Route> {}
+        div {
+            style: "min-height:100vh; display:grid; place-items:center; font-family:sans-serif;",
+
+            button {
+                onclick: move |_| show.set(true),
+            }
+        }
+        if show() {
+            Modal{
+                title: "enter value",
+                on_close: move || show.set(false),
+                on_commit: move |s| committed.set(s),
+            }
+        }
+    }
+}
+
+#[derive(Props, PartialEq, Clone)]
+struct ModalProps {
+    title: String,
+    on_close: EventHandler<()>,
+    on_commit: EventHandler<String>,
+}
+
+#[component]
+fn Modal(props: ModalProps) -> Element {
+    let mut draft = use_signal(|| String::new());
+    let handle_escape = {
+        let on_close = props.on_close;
+        move |e: KeyboardEvent| {
+            if e.key() == dioxus::events::Key::Escape {
+                on_close.call(());
+            }
+        }
+    };
+    rsx! {
+        // Backdrop
+        div {
+            tabindex: 0,
+            onkeydown: handle_escape,
+            // Click anywhere on the backdrop closes
+            onclick: move |_| props.on_close.call(()),
+            style: "position:fixed; inset:0; background:rgba(0,0,0,0.45); \
+                    display:flex; align-items:center; justify-content:center;",
+
+            // Dialog
+            div {
+                onclick: move |e| e.stop_propagation(), // prevent backdrop click
+                role: "dialog",
+                "aria-modal": "true",
+                style: "background:white; width:300px; border-radius:10px; \
+                        box-shadow:0 18px 40px rgba(0,0,0,0.25); padding:16px;",
+
+                h2 { style: "margin:0 0 10px 0; font-size:18px; font-weight:600;", "{props.title}" }
+
+                input {
+                    r#type: "text",
+                    value: "{draft}",
+                    style: "width:100%; padding:8px; border:1px solid #ccc; border-radius:6px;",
+                    autofocus: true,
+                    oninput: move |e| draft.set(e.value()),
+                    onkeydown: {
+                        let on_commit = props.on_commit;
+                        let on_close = props.on_close;
+                        move |e: KeyboardEvent| {
+                            if e.key() == dioxus::events::Key::Enter {
+                                on_commit.call(draft());
+                                on_close.call(());
+                                e.prevent_default();
+                            }
+                        }
+                    }
+                },
+
+            }
+
+            div {
+                style: "margin-top:12px; text-align:right;",
+                button {
+                    onclick: move |_| props.on_close.call(()),
+                    style: "padding:6px 12px; border:1px solid #ccc; border-radius:6px;",
+                    "Close"
+                }
+            }
+        }
     }
 }
