@@ -90,7 +90,6 @@ fn Modal(props: ModalProps) -> Element {
 
             // Dialog
             div {
-                onclick: move |e| e.stop_propagation(), // prevent backdrop click
                 role: "dialog",
                 "aria-modal": "true",
                 style: "background:white; width:300px; border-radius:10px; \
