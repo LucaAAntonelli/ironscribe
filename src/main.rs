@@ -42,16 +42,16 @@ fn App() -> Element {
     });
 
     let cfg = use_server_future(get_config)?;
-    match cfg() {
-        Some(Ok(config)) => {
-            tracing::info!("Found config: {:?}", config);
-            // if config doesn't contain a path, config.data_dir is None and we need to ask the
-            // user for one
-            show.set(config.data_dir.is_none());
+
+    use_effect({
+        move || match cfg() {
+            Some(Ok(config)) => show.set(config.data_dir.is_none()),
+
+            Some(Err(e)) => tracing::info!("Found error: {}", e),
+            None => tracing::info!("Loading..."),
         }
-        Some(Err(e)) => tracing::info!("Found error: {}", e),
-        None => tracing::info!("Loading..."),
-    }
+    });
+
     rsx! {
         document::Stylesheet { href: MAIN_CSS }
         document::Link { rel: "icon", href: FAVICON }
