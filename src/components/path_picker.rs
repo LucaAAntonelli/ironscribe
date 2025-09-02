@@ -9,7 +9,7 @@ pub struct ModalProps {
 
 #[component]
 pub fn Modal(props: ModalProps) -> Element {
-    let mut draft = use_signal(|| String::new());
+    let mut draft = use_signal(String::new);
     rsx! {
         // Backdrop
         div {

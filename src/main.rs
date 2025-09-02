@@ -34,7 +34,7 @@ fn App() -> Element {
     // Toggles whether dialog shows up or not
     let mut show = use_signal(|| true);
     // Used to commit text box input in one go
-    let mut committed = use_signal(|| String::new());
+    let mut committed = use_signal(String::new);
     // use_effect is triggered every time `committed` changes => auto-uptade for log
     use_effect({
         move || {
