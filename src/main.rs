@@ -57,10 +57,10 @@ fn App() -> Element {
         document::Link { rel: "icon", href: FAVICON }
 
         Router::<Route> {}
-        div {
-            style: "min-height:100vh; display:grid; place-items:center; font-family:sans-serif;",
-        }
         if show() {
+            div {
+                style: "min-height:100vh; display:grid; place-items:center; font-family:sans-serif;",
+            }
             Modal{
                 title: "Enter Path",
                 on_close: move || show.set(false),
