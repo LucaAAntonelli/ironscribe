@@ -34,6 +34,7 @@ fn App() -> Element {
     let mut show = use_signal(|| true);
     // Used to commit text box input in one go
     let mut committed = use_signal(|| String::new());
+    // use_effect is triggered every time `committed` changes => auto-uptade for log
     use_effect({
         move || {
             tracing::info!("[committed changed]: {}", committed());
@@ -44,6 +45,8 @@ fn App() -> Element {
     match cfg() {
         Some(Ok(config)) => {
             tracing::info!("Found config: {:?}", config);
+            // if config doesn't contain a path, config.data_dir is None and we need to ask the
+            // user for one
             show.set(config.data_dir.is_none());
         }
         Some(Err(e)) => tracing::info!("Found error: {}", e),
@@ -56,10 +59,6 @@ fn App() -> Element {
         Router::<Route> {}
         div {
             style: "min-height:100vh; display:grid; place-items:center; font-family:sans-serif;",
-
-            button {
-                onclick: move |_| show.set(true),
-            }
         }
         if show() {
             Modal{
