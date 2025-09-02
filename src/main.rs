@@ -81,21 +81,10 @@ struct ModalProps {
 #[component]
 fn Modal(props: ModalProps) -> Element {
     let mut draft = use_signal(|| String::new());
-    let handle_escape = {
-        let on_close = props.on_close;
-        move |e: KeyboardEvent| {
-            if e.key() == dioxus::events::Key::Escape {
-                on_close.call(());
-            }
-        }
-    };
     rsx! {
         // Backdrop
         div {
             tabindex: 0,
-            onkeydown: handle_escape,
-            // Click anywhere on the backdrop closes
-            onclick: move |_| props.on_close.call(()),
             style: "position:fixed; inset:0; background:rgba(0,0,0,0.45); \
                     display:flex; align-items:center; justify-content:center;",
 
