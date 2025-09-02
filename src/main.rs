@@ -34,7 +34,6 @@ fn App() -> Element {
     let mut show = use_signal(|| true);
     // Used to commit text box input in one go
     let mut committed = use_signal(|| String::new());
-    // this is called every time committed changes
     use_effect({
         move || {
             tracing::info!("[committed changed]: {}", committed());
@@ -43,7 +42,10 @@ fn App() -> Element {
 
     let cfg = use_server_future(get_config)?;
     match cfg() {
-        Some(Ok(config)) => tracing::info!("Found config: {:?}", config),
+        Some(Ok(config)) => {
+            tracing::info!("Found config: {:?}", config);
+            show.set(config.data_dir.is_none());
+        }
         Some(Err(e)) => tracing::info!("Found error: {}", e),
         None => tracing::info!("Loading..."),
     }
@@ -61,7 +63,7 @@ fn App() -> Element {
         }
         if show() {
             Modal{
-                title: "enter value",
+                title: "Enter Path",
                 on_close: move || show.set(false),
                 on_commit: move |s| committed.set(s),
             }
@@ -126,15 +128,6 @@ fn Modal(props: ModalProps) -> Element {
                     }
                 },
 
-            }
-
-            div {
-                style: "margin-top:12px; text-align:right;",
-                button {
-                    onclick: move |_| props.on_close.call(()),
-                    style: "padding:6px 12px; border:1px solid #ccc; border-radius:6px;",
-                    "Close"
-                }
             }
         }
     }
