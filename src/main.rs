@@ -95,7 +95,7 @@ fn Modal(props: ModalProps) -> Element {
                 style: "background:white; width:300px; border-radius:10px; \
                         box-shadow:0 18px 40px rgba(0,0,0,0.25); padding:16px;",
 
-                h2 { style: "margin:0 0 10px 0; font-size:18px; font-weight:600;", "{props.title}" }
+                h2 { style: "margin:0 0 10px 0; font-size:18px; font-weight:600; color:black;", "{props.title}" }
 
                 input {
                     r#type: "text",
