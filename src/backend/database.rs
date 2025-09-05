@@ -1,8 +1,6 @@
 use chrono::{DateTime, Utc};
-use std::path::PathBuf;
 use std::{cmp::Ordering, fmt::Display};
 
-use crate::types::Config;
 use dioxus::prelude::*;
 use serde::{Deserialize, Serialize};
 
@@ -182,22 +180,4 @@ pub async fn list_books() -> Result<BookRecords, ServerFnError> {
         .collect()
     });
     Ok(BookRecords { records: books })
-}
-
-#[server]
-pub async fn get_config() -> Result<Config, ServerFnError> {
-    crate::config::init_config().map_err(ServerFnError::new)
-}
-
-#[server]
-pub async fn persist_config(config: Config) -> Result<(), ServerFnError> {
-    crate::config::persist_config(config).map_err(ServerFnError::new)
-}
-
-#[server]
-pub async fn persist_path(path: PathBuf) -> Result<(), ServerFnError> {
-    crate::config::persist_config(Config {
-        data_dir: Some(path),
-    })
-    .map_err(ServerFnError::new)
 }

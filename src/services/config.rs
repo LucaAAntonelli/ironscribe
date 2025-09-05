@@ -1,5 +1,5 @@
 #![cfg(feature = "server")]
-use crate::types::Config;
+use crate::shared::types::Config;
 use anyhow::{anyhow, Context};
 use directories::ProjectDirs;
 use std::fs::{create_dir_all, File};

@@ -1,7 +1,7 @@
 use dioxus::prelude::*;
 use itertools::Itertools;
 
-use crate::backend::SortKey;
+use crate::backend::database::SortKey;
 
 struct SortState {
     key: SortKey,
@@ -10,7 +10,7 @@ struct SortState {
 
 #[component]
 pub fn Books() -> Element {
-    let books = use_server_future(crate::backend::list_books)?;
+    let books = use_server_future(crate::backend::database::list_books)?;
 
     let mut sort_state = use_signal(|| SortState {
         key: SortKey::DateAdded,
