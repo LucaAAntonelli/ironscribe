@@ -4,7 +4,6 @@ mod services;
 mod shared;
 
 use std::path::PathBuf;
-use std::str::FromStr;
 
 use crate::backend::config::persist_path;
 use crate::frontend::components::Books;
