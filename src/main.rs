@@ -2,12 +2,17 @@ mod backend;
 mod components;
 mod config;
 mod types;
+use std::path::PathBuf;
+use std::str::FromStr;
+
 use backend::get_config;
+use backend::persist_config;
 use components::Books;
 use components::Modal;
 #[cfg(feature = "server")]
 use config::init_config;
 use dioxus::prelude::*;
+use types::Config;
 
 const FAVICON: Asset = asset!("/assets/favicon.ico");
 const MAIN_CSS: Asset = asset!("assets/main.css");
@@ -65,7 +70,15 @@ fn App() -> Element {
             Modal{
                 title: "Enter Path",
                 on_close: move || show.set(false),
-                on_commit: move |s| committed.set(s),
+                on_commit: move |s: String| {
+                    committed.set(s.clone());
+                    spawn(async move {
+                        match persist_config(Config { data_dir: Some(PathBuf::from_str(&s).unwrap()) } ).await {
+                            Ok(_) => {},
+                            Err(e) => eprintln!("Failed to persist config: {e}")
+                        }
+                    });
+                }
             }
         }
     }
