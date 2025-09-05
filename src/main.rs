@@ -37,7 +37,7 @@ fn main() {
 #[component]
 fn App() -> Element {
     // Toggles whether dialog shows up or not
-    let mut show = use_signal(|| true);
+    let mut show = use_signal(|| false);
     // Used to commit text box input in one go
     let mut committed = use_signal(String::new);
     // use_effect is triggered every time `committed` changes => auto-uptade for log
@@ -73,7 +73,7 @@ fn App() -> Element {
                 on_commit: move |s: String| {
                     committed.set(s.clone());
                     spawn(async move {
-                        match persist_path(PathBuf::from_str(&s).unwrap()).await {
+                        match persist_path(PathBuf::from(s)).await {
                             Ok(_) => {},
                             Err(e) => eprintln!("Failed to persist config: {e}")
                         }
