@@ -1,4 +1,5 @@
-use rusqlite::{self, Connection};
+#![cfg(feature = "server")]
+use rusqlite::Connection;
 use std::path::PathBuf;
 
 pub fn create_db(path: PathBuf) -> anyhow::Result<()> {
