@@ -20,7 +20,6 @@ chrono = { version = "0.4.41", features = ["serde"] }
 tracing = "0.1.41"
 directories = "6.0.0"
 anyhow = "1.0.99"
-engrave = "0.1.0"
 
 [features]
 default = []
