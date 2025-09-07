@@ -8,15 +8,19 @@ edition = "2021"
 
 [dependencies]
 dioxus = { version = "0.6.0", features = ["fullstack", "router"] }
-reqwest = { version = "0.12.22", features = ["json"]}
-serde = { version = "1.0.219", features = ["derive"]}
-rusqlite = { version = "0.37.0", optional = true, features = ["bundled", "chrono"]}
-serde_json = { version = "1.0.143", optional = true}
-itertools = { version = "0.14.0"}
-chrono = { version = "0.4.41" , features = ["serde"]}
+reqwest = { version = "0.12.22", features = ["json"] }
+serde = { version = "1.0.219", features = ["derive"] }
+rusqlite = { version = "0.37.0", optional = true, features = [
+  "bundled",
+  "chrono",
+] }
+serde_json = { version = "1.0.143", optional = true }
+itertools = { version = "0.14.0" }
+chrono = { version = "0.4.41", features = ["serde"] }
 tracing = "0.1.41"
 directories = "6.0.0"
 anyhow = "1.0.99"
+engrave = "0.1.0"
 
 [features]
 default = []
