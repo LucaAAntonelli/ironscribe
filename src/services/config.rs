@@ -13,7 +13,7 @@ impl Config {
         Ok(config_path)
     }
 
-    pub fn init_config() -> anyhow::Result<()> {
+    pub fn init() -> anyhow::Result<()> {
         let config_path = Self::file_path()?;
         create_dir_all(config_path.clone())?;
         if Path::exists(config_path.as_path()) {
@@ -24,7 +24,7 @@ impl Config {
         Ok(())
     }
 
-    pub fn read_config() -> anyhow::Result<Self> {
+    pub fn read() -> anyhow::Result<Self> {
         let config_path = Self::file_path()?;
         let content =
             std::fs::read_to_string(config_path).context("Failed to read config file!")?;
@@ -34,7 +34,7 @@ impl Config {
         }
     }
 
-    pub fn save_config(&self) -> anyhow::Result<()> {
+    pub fn save(&self) -> anyhow::Result<()> {
         let config_path = Self::file_path()?;
         let content = serde_json::to_string(self).context("Failed to serialize Config!")?;
         std::fs::write(config_path, content)
