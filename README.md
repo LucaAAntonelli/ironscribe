@@ -21,6 +21,17 @@ Since I'm not planning on porting all Calibre features, I'm also leaving out qui
 
 Since I'm taking heavy inspiration from both calibre and calibre-web, I'll also handle metadata with some sort of relational database. I'm still deciding between something lightweight and local like SQLite, just like calibre uses, or something more "high-end" like postgreSQL, which I'm already familiar with. 
 
+# Roadmap to Replacing Calbire and Calibre-Web (For Myself)
+- [ ] Database with metadata for books
+- [ ] Auto-import folder
+- [ ] Library view
+  - [ ] Table view
+  - [ ] Thumbnail view
+- [ ] Tracking view
+- [ ] Auto-fetch Goodreads ID
+- [ ] Fetch page count via Goodreads ID
+- [ ] Edit text in ebooks
+
 # Planned Improvements Over Calibre
 Calibre has been mentioned several times above, and it's an absolutely great program. It provides a huge variety of tools for editing both ebooks and their metadata, and overall managing a virtual library. But there are a few short-comings in my opinion that I'd like to improve on here:
 
