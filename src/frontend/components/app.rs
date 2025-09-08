@@ -7,12 +7,6 @@ use std::path::PathBuf;
 const FAVICON: Asset = asset!("/assets/favicon.ico");
 const MAIN_CSS: Asset = asset!("assets/main.css");
 
-#[derive(Routable, Clone, PartialEq)]
-enum Route {
-    #[route("/")]
-    Books,
-}
-
 #[component]
 pub fn App() -> Element {
     // Toggles whether dialog shows up or not
