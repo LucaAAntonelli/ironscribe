@@ -26,7 +26,10 @@ pub fn App() -> Element {
         move || match cfg() {
             Some(Ok(config)) => show.set(config.data_dir.is_none()),
 
-            Some(Err(e)) => tracing::info!("Found error: {}", e),
+            Some(Err(e)) => {
+                show.set(true);
+                tracing::info!("Found error: {}", e);
+            }
             None => tracing::info!("Loading..."),
         }
     });
