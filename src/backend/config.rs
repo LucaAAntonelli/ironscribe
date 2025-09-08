@@ -36,6 +36,14 @@ pub async fn write_config(config: Config) -> Result<(), ServerFnError> {
 }
 
 #[server]
+pub async fn write_path(path: PathBuf) -> Result<(), ServerFnError> {
+    let config = Config {
+        data_dir: Some(path),
+    };
+    write_config(config).await
+}
+
+#[server]
 pub async fn persist_path(path: PathBuf) -> Result<(), ServerFnError> {
     persist_config(Config {
         data_dir: Some(path),

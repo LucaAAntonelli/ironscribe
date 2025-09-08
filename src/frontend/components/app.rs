@@ -1,5 +1,4 @@
-use crate::backend::config::get_config;
-use crate::backend::config::persist_path;
+use crate::backend::config::{read_config, write_path};
 use crate::frontend::components::Books;
 use crate::frontend::components::Modal;
 use dioxus::prelude::*;
@@ -27,7 +26,7 @@ pub fn App() -> Element {
         }
     });
 
-    let cfg = use_server_future(get_config)?;
+    let cfg = use_server_future(read_config)?;
 
     use_effect({
         move || match cfg() {
@@ -53,8 +52,11 @@ pub fn App() -> Element {
                 on_commit: move |s: String| {
                     committed.set(s.clone());
                     spawn(async move {
-                        match persist_path(PathBuf::from(s)).await {
-                            Ok(_) => {},
+                        match write_path(PathBuf::from(s)).await {
+                            Ok(_) => {
+                                // If writing to file worked, we need to update the cfg signal
+
+                            },
                             Err(e) => eprintln!("Failed to persist config: {e}")
                         }
                     });
