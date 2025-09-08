@@ -26,8 +26,13 @@ pub async fn create_config() -> Result<(), ServerFnError> {
 }
 
 #[server]
-pub async fn get_config() -> Result<Config, ServerFnError> {
-    init_config().map_err(ServerFnError::new)
+pub async fn read_config() -> Result<Config, ServerFnError> {
+    Config::read().map_err(ServerFnError::new)
+}
+
+#[server]
+pub async fn write_config(config: Config) -> Result<(), ServerFnError> {
+    config.write().map_err(ServerFnError::new)
 }
 
 #[server]
