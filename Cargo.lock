@@ -2662,6 +2662,7 @@ dependencies = [
  "dioxus",
  "directories",
  "itertools",
+ "once_cell",
  "reqwest",
  "rusqlite",
  "serde",

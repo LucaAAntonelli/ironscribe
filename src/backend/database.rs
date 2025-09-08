@@ -1,9 +1,16 @@
+#[cfg(feature = "server")]
+use crate::services::database::with_conn;
+use anyhow::anyhow;
 use chrono::{DateTime, Utc};
+use dioxus::prelude::server_fn::error::NoCustomError;
+use std::cell::RefCell;
 use std::{cmp::Ordering, fmt::Display};
 
 use dioxus::prelude::*;
+#[cfg(feature = "server")]
+use once_cell::sync::OnceCell;
 use serde::{Deserialize, Serialize};
-
+use std::path::PathBuf;
 #[derive(Serialize, Deserialize, Clone)]
 pub struct BookRecords {
     pub records: Vec<BookRecord>,
@@ -103,24 +110,16 @@ impl BookRecord {
 }
 
 #[cfg(feature = "server")]
+pub static DB_PATH: OnceCell<PathBuf> = OnceCell::new();
+
+#[cfg(feature = "server")]
 thread_local! {
-    pub static DB: rusqlite::Connection = {
-        let conn = rusqlite::Connection::open("metadata.db").expect("Failed to open database");
-
-        let sql = std::fs::read_to_string("schema.sql").expect("Failed to parse SQL schema file!");
-        conn.execute("PRAGMA foreign_keys = ON", []).unwrap();
-        conn.execute_batch(&sql).unwrap();
-
-        conn
-    };
+    pub static DB: RefCell<Option<rusqlite::Connection>> = RefCell::new(None);
 }
 
 #[server]
 pub async fn list_books() -> Result<BookRecords, ServerFnError> {
-    let books = DB.with(|f| {
-        f.prepare(
-            "
-            WITH series_info AS (
+    let query = r#"WITH series_info AS (
                 SELECT 
                     bsl.book, 
                     json_group_array(
@@ -152,11 +151,10 @@ pub async fn list_books() -> Result<BookRecords, ServerFnError> {
                 LEFT JOIN series_info ON series_info.book = books.id 
                 JOIN authors_info ON authors_info.book = books.id 
             ORDER BY 
-                books.date_added ASC
-        ",
-        )
-        .unwrap()
-        .query_map([], |row| {
+                books.date_added ASC"#;
+    let books = with_conn(|conn| {
+        let mut stmt = conn.prepare(query)?;
+        let rows = stmt.query_map([], |row| {
             let authors_json_str: String = row.get("authors")?;
             let authors_sort_json_str: String = row.get("authors_sort")?;
             let series_json_str: String = row.get("series_and_volume").unwrap_or_default();
@@ -172,12 +170,12 @@ pub async fn list_books() -> Result<BookRecords, ServerFnError> {
                 date_published: row.get("date_published")?,
                 date_modified: row.get("last_modified")?,
                 goodreads_id: row.get("goodreads_id")?,
-
             })
-        })
-        .unwrap()
-        .map(|r| r.unwrap())
-        .collect()
-    });
+        })?;
+        rows.collect::<Result<Vec<_>, _>>()
+            .map_err(|_| anyhow!("Failed to map SQL data to Rust structs!"))
+    })
+    .map_err(|e| -> ServerFnError<NoCustomError> { ServerFnError::ServerError(e.to_string()) })?;
+
     Ok(BookRecords { records: books })
 }
