@@ -1,5 +1,5 @@
 #[cfg(feature = "server")]
-use crate::services::config::{init_config, persist_config};
+use crate::services::config::persist_config;
 use crate::shared::types::Config;
 use dioxus::prelude::*;
 use std::path::PathBuf;
@@ -27,6 +27,8 @@ pub async fn create_config() -> Result<(), ServerFnError> {
 
 #[server]
 pub async fn read_config() -> Result<Config, ServerFnError> {
+    // Call create function, will do nothing if file exists already
+    create_config().await?;
     Config::read().map_err(ServerFnError::new)
 }
 
