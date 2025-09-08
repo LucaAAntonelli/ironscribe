@@ -35,7 +35,6 @@ pub fn App() -> Element {
         document::Stylesheet { href: MAIN_CSS }
         document::Link { rel: "icon", href: FAVICON }
 
-        Router::<Route> {}
         if show() {
             div {
                 style: "min-height:100vh; display:grid; place-items:center; font-family:sans-serif;",
