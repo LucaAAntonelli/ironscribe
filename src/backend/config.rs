@@ -5,6 +5,27 @@ use dioxus::prelude::*;
 use std::path::PathBuf;
 
 #[server]
+pub async fn create_config() -> Result<(), ServerFnError> {
+    match Config::file_exists() {
+        Ok(exists) => {
+            if exists {
+                // nothing to do, exists already
+                tracing::info!("Config exists, skipping creation");
+                Ok(())
+            } else {
+                // create config file
+                tracing::info!("Creating config file");
+                Config::init().map_err(ServerFnError::new)?;
+                Ok(())
+            }
+        }
+        Err(e) => Err(ServerFnError::new(format!(
+            "Failed to check file system: {e}"
+        ))),
+    }
+}
+
+#[server]
 pub async fn get_config() -> Result<Config, ServerFnError> {
     init_config().map_err(ServerFnError::new)
 }

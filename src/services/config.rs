@@ -34,12 +34,17 @@ impl Config {
         }
     }
 
-    pub fn save(&self) -> anyhow::Result<()> {
+    pub fn write(&self) -> anyhow::Result<()> {
         let config_path = Self::file_path()?;
         let content = serde_json::to_string(self).context("Failed to serialize Config!")?;
         std::fs::write(config_path, content)
             .context("Failed to write serialized config to file!")?;
         Ok(())
+    }
+
+    pub fn file_exists() -> anyhow::Result<bool> {
+        let config_path = Self::file_path()?;
+        Ok(Path::exists(config_path.as_path()))
     }
 }
 
