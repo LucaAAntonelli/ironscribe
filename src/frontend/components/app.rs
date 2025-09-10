@@ -6,7 +6,6 @@ use std::path::PathBuf;
 const FAVICON: Asset = asset!("/assets/favicon.ico");
 const MAIN_CSS: Asset = asset!("assets/main.css");
 
-
 #[component]
 pub fn App() -> Element {
     let mut committed = use_signal(String::new);
