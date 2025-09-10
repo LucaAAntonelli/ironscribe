@@ -9,8 +9,11 @@ struct SortState {
 }
 
 #[component]
-pub fn Books() -> Element {
-    let books = use_server_future(crate::backend::database::list_books)?;
+pub fn Books(reload_key: u64) -> Element {
+    let books = use_server_future(move || {
+        let _k = reload_key; // re-run when key changes
+        crate::backend::database::list_books()
+    })?;
 
     let mut sort_state = use_signal(|| SortState {
         key: SortKey::DateAdded,
