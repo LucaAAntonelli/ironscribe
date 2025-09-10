@@ -15,27 +15,52 @@ impl Config {
 
     pub fn init() -> anyhow::Result<()> {
         let config_path = Self::file_path()?;
-        create_dir_all(config_path.clone())?;
-        if Path::exists(config_path.as_path()) {
-            return Err(anyhow!("File already exists!"));
-        } else {
-            File::create(config_path)?;
+        if let Some(parent) = config_path.parent() {
+            create_dir_all(parent)?;
         }
+        if Path::exists(config_path.as_path()) {
+            // If it's a file we are done; if it's a directory, that's an error from previous buggy runs
+            if config_path.is_dir() {
+                return Err(anyhow!(
+                    "A directory exists where the config file should be: {:?}",
+                    config_path
+                ));
+            }
+            return Ok(()); // already exists, nothing to do
+        }
+    // Write default empty config
+    std::fs::write(&config_path, serde_json::to_string(&Config { data_dir: None })?)?;
         Ok(())
     }
 
     pub fn read() -> anyhow::Result<Self> {
         let config_path = Self::file_path()?;
-        let content =
-            std::fs::read_to_string(config_path).context("Failed to read config file!")?;
+        if config_path.is_dir() {
+            return Err(anyhow!(
+                "Expected config file but found a directory at {:?}. Please remove or rename it.",
+                config_path
+            ));
+        }
+        let content = std::fs::read_to_string(config_path.clone())
+            .context("Failed to read config file!")?;
+        if content.trim().is_empty() {
+            // Treat empty file as default config
+            return Ok(Config { data_dir: None });
+        }
         match serde_json::from_str(&content) {
             Ok(config) => Ok(config),
-            Err(e) => Err(anyhow!("Failed to deserialize Config: {}", e)),
+            Err(e) => {
+                tracing::warn!("Config file malformed ({}). Rewriting default & continuing.", e);
+                let default = Config { data_dir: None };
+                std::fs::write(&config_path, serde_json::to_string(&default)?)?;
+                Ok(default)
+            }
         }
     }
 
     pub fn write(&self) -> anyhow::Result<()> {
         let config_path = Self::file_path()?;
+    if let Some(parent) = config_path.parent() { create_dir_all(parent)?; }
         let content = serde_json::to_string(self).context("Failed to serialize Config!")?;
         std::fs::write(config_path, content)
             .context("Failed to write serialized config to file!")?;
