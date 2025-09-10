@@ -1,6 +1,8 @@
 #[cfg(feature = "server")]
 use crate::services::config::persist_config;
 use crate::shared::types::Config;
+#[cfg(feature = "server")]
+use crate::services::database::set_db_path;
 use dioxus::prelude::*;
 use std::path::PathBuf;
 
@@ -27,9 +29,23 @@ pub async fn create_config() -> Result<(), ServerFnError> {
 
 #[server]
 pub async fn read_config() -> Result<Config, ServerFnError> {
-    // Call create function, will do nothing if file exists already
+    // Ensure config file exists (noop if it already does)
     create_config().await?;
-    Config::read().map_err(ServerFnError::new)
+    let mut cfg = Config::read().map_err(ServerFnError::new)?;
+
+    // If a path (directory) is configured, validate it exists (or can be created) and open/create DB inside.
+    if let Some(dir) = cfg.data_dir.clone() {
+        // Always attempt to set path (handles both existing and non-existing directories). It will
+        // create the directory tree if needed.
+        if crate::backend::database::DB_PATH.get().is_none() {
+            if let Err(e) = set_db_path(dir.clone()) {
+                tracing::error!("Failed to initialize DB using configured directory {:?}: {e}", dir);
+                cfg.data_dir = None;
+            }
+        }
+    }
+
+    Ok(cfg)
 }
 
 #[server]
@@ -39,10 +55,9 @@ pub async fn write_config(config: Config) -> Result<(), ServerFnError> {
 
 #[server]
 pub async fn write_path(path: PathBuf) -> Result<(), ServerFnError> {
-    let config = Config {
-        data_dir: Some(path),
-    };
-    write_config(config).await
+    // User supplies a path to a directory. Create/open library.db inside & run migrations.
+    set_db_path(path).map_err(ServerFnError::new)?;
+    Ok(())
 }
 
 #[server]
