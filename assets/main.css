@@ -61,8 +61,8 @@ html, body {
 table {
   text-align: left;
   position: relative;
-  background: #a6a9b5
-  color: #FFFFFF
+  background: #a6a9b5;
+  color: #FFFFFF;
 }
 
 th {
@@ -70,7 +70,7 @@ th {
   color: #FFFFFF;
   position: sticky;
   top: 0;
-  user-select: none /* disable text select/cursor change on table header rows */
+  user-select: none; /* disable text select/cursor change on table header rows */
 }
 
 tbody {
@@ -79,7 +79,7 @@ tbody {
 
 tbody tr:nth-child(odd) {
   background-color: #000000;
-  color: #FFFFFF
+  color: #FFFFFF;
 }
 
 tr:hover {
