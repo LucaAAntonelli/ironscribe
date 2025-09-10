@@ -1,3 +1,4 @@
 {
-    "vim.useSystemClipboard": true
+    "vim.useSystemClipboard": true,
+    "svn.ignoreMissingSvnWarning": true
 }
