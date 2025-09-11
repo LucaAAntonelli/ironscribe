@@ -10,6 +10,11 @@ use crate::shared::types::Config;
 pub fn set_db_path(input_path: PathBuf) -> Result<()> {
     tracing::info!("set_db_path called with input: {:?}", input_path);
 
+    // Error out if empty path provided
+    if input_path.as_os_str().is_empty() {
+        return Err(anyhow!("Provided path is empty"));
+    }
+
     // Accept legacy usage where a full file path (ending in .db) was stored previously.
     let dir_path = if input_path.extension().map(|e| e == "db").unwrap_or(false) {
         input_path.parent().map(|p| p.to_path_buf()).unwrap_or(input_path.clone())
