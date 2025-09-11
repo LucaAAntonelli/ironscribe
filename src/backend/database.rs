@@ -3,18 +3,18 @@ use crate::services::database::with_conn;
 use chrono::{DateTime, Utc};
 use std::{cmp::Ordering, fmt::Display};
 
-use dioxus::prelude::*;
+#[cfg(feature = "server")]
+use anyhow::anyhow;
 #[cfg(feature = "server")]
 use dioxus::prelude::server_fn::error::NoCustomError;
+use dioxus::prelude::*;
 #[cfg(feature = "server")]
 use once_cell::sync::OnceCell;
+use serde::{Deserialize, Serialize};
 #[cfg(feature = "server")]
 use std::cell::RefCell;
 #[cfg(feature = "server")]
 use std::path::PathBuf;
-#[cfg(feature = "server")]
-use anyhow::anyhow;
-use serde::{Deserialize, Serialize};
 #[derive(Serialize, Deserialize, Clone)]
 pub struct BookRecords {
     pub records: Vec<BookRecord>,
@@ -118,7 +118,7 @@ pub static DB_PATH: OnceCell<PathBuf> = OnceCell::new();
 
 #[cfg(feature = "server")]
 thread_local! {
-    pub static DB: RefCell<Option<rusqlite::Connection>> = RefCell::new(None);
+    pub static DB: RefCell<Option<rusqlite::Connection>> = const { RefCell::new(None) };
 }
 
 #[server]
