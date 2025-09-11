@@ -1,10 +1,3 @@
--- Keep for now to not break UI parts from tutorial
-CREATE TABLE IF NOT EXISTS dogs (
-  id INTEGER PRIMARY KEY,
-  url TEXT NOT NULL
-);
-
-
 CREATE TABLE IF NOT EXISTS authors (
     id INTEGER PRIMARY KEY,
     name TEXT NOT NULL COLLATE NOCASE,
