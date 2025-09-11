@@ -38,7 +38,7 @@ pub fn set_db_path(input_path: PathBuf) -> Result<()> {
         ));
     }
     std::fs::create_dir_all(&dir_path)
-        .with_context(|| format!("Creating/ensuring data directory {:?}", dir_path))?;
+        .with_context(|| format!("Creating/ensuring data directory {dir_path:?}"))?;
 
     let db_file_path = dir_path.join("library.db");
     let first_time = !db_file_path.exists();
