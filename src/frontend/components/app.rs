@@ -11,8 +11,8 @@ pub fn App() -> Element {
     let mut committed = use_signal(String::new);
 
     // Config future; key it on a state value so we can refetch after user input
-    let mut config_reload_key = use_signal(|| 0u64);
-    let mut books_reload_key = use_signal(|| 0u64);
+    let config_reload_key = use_signal(|| 0u64);
+    let books_reload_key = use_signal(|| 0u64);
     let cfg = use_server_future(move || {
         let _k = config_reload_key();
         read_config()
@@ -28,13 +28,23 @@ pub fn App() -> Element {
     });
 
     let contents = match cfg() {
-        None => rsx! { div { "Loading configuration..." } },
-        Some(Err(e)) => rsx! { div { "Config error: {e}" } },
+        None => rsx! {
+            div { "Loading configuration..." }
+        },
+        Some(Err(e)) => rsx! {
+            div { "Config error: {e}" }
+        },
         Some(Ok(c)) => {
             if c.data_dir.is_some() {
-                rsx! { Books { reload_key: books_reload_key() } }
+                rsx! {
+                    Books { reload_key: books_reload_key() }
+                }
             } else {
-                rsx! { div { style: "min-height:100vh; display:grid; place-items:center; font-family:sans-serif;", "Configure a data directory to continue." } }
+                rsx! {
+                    div { style: "min-height:100vh; display:grid; place-items:center; font-family:sans-serif;",
+                        "Configure a data directory to continue."
+                    }
+                }
             }
         }
     };
@@ -60,11 +70,11 @@ pub fn App() -> Element {
                                     config_reload_key.set(config_reload_key() + 1);
                                     books_reload_key.set(books_reload_key() + 1);
                                 }
-                                Err(e) => eprintln!("Failed to persist config: {e}")
+                                Err(e) => eprintln!("Failed to persist config: {e}"),
                             }
                         }
                     });
-                }
+                },
             }
         }
     }
