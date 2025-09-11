@@ -1,16 +1,12 @@
 #[cfg(feature = "server")]
 use crate::services::database::with_conn;
-use anyhow::anyhow;
 use chrono::{DateTime, Utc};
-use dioxus::prelude::server_fn::error::NoCustomError;
-use std::cell::RefCell;
 use std::{cmp::Ordering, fmt::Display};
 
 use dioxus::prelude::*;
 #[cfg(feature = "server")]
 use once_cell::sync::OnceCell;
 use serde::{Deserialize, Serialize};
-use std::path::PathBuf;
 #[derive(Serialize, Deserialize, Clone)]
 pub struct BookRecords {
     pub records: Vec<BookRecord>,
@@ -120,37 +116,37 @@ thread_local! {
 #[server]
 pub async fn list_books() -> Result<BookRecords, ServerFnError> {
     let query = r#"WITH series_info AS (
-                SELECT 
-                    bsl.book, 
+                SELECT
+                    bsl.book,
                     json_group_array(
                         json_object(
                             'series', s.name, 'sort', s.sort, 'volume', bsl.entry
                         )
-                    ) series_and_volume 
-                FROM 
-                    series AS s 
-                    JOIN books_series_link bsl ON bsl.series = s.id 
-                GROUP BY 
+                    ) series_and_volume
+                FROM
+                    series AS s
+                    JOIN books_series_link bsl ON bsl.series = s.id
+                GROUP BY
                     bsl.book
-            ), 
+            ),
             authors_info AS (
-                SELECT 
-                    json_group_array(a.name) authors, 
+                SELECT
+                    json_group_array(a.name) authors,
                     json_group_array(a.sort) authors_sort,
-                    bal.book 
-                FROM 
-                    authors AS a 
-                    JOIN books_authors_link bal ON a.id = bal.author 
-                GROUP BY 
                     bal.book
-            ) 
-            SELECT 
-                id, title, sort, date_added, date_published, last_modified, number_of_pages, goodreads_id, authors, authors_sort, series_and_volume 
-            FROM 
-                books 
-                LEFT JOIN series_info ON series_info.book = books.id 
-                JOIN authors_info ON authors_info.book = books.id 
-            ORDER BY 
+                FROM
+                    authors AS a
+                    JOIN books_authors_link bal ON a.id = bal.author
+                GROUP BY
+                    bal.book
+            )
+            SELECT
+                id, title, sort, date_added, date_published, last_modified, number_of_pages, goodreads_id, authors, authors_sort, series_and_volume
+            FROM
+                books
+                LEFT JOIN series_info ON series_info.book = books.id
+                JOIN authors_info ON authors_info.book = books.id
+            ORDER BY
                 books.date_added ASC"#;
     let books = with_conn(|conn| {
         let mut stmt = conn.prepare(query)?;
