@@ -2,7 +2,7 @@
 use crate::backend::database::{DB, DB_PATH};
 use anyhow::{anyhow, Context, Result};
 use rusqlite::Connection;
-use std::path::{Path, PathBuf};
+use std::path::PathBuf;
 
 use crate::shared::types::Config;
 
@@ -17,7 +17,10 @@ pub fn set_db_path(input_path: PathBuf) -> Result<()> {
 
     // Accept legacy usage where a full file path (ending in .db) was stored previously.
     let dir_path = if input_path.extension().map(|e| e == "db").unwrap_or(false) {
-        input_path.parent().map(|p| p.to_path_buf()).unwrap_or(input_path.clone())
+        input_path
+            .parent()
+            .map(|p| p.to_path_buf())
+            .unwrap_or(input_path.clone())
     } else if input_path.is_file() {
         input_path
             .parent()
@@ -29,15 +32,21 @@ pub fn set_db_path(input_path: PathBuf) -> Result<()> {
 
     // Ensure directory exists (create full tree). If a non-directory exists at that path -> error.
     if dir_path.exists() && !dir_path.is_dir() {
-        return Err(anyhow!("Provided path exists but is not a directory: {:?}", dir_path));
+        return Err(anyhow!(
+            "Provided path exists but is not a directory: {:?}",
+            dir_path
+        ));
     }
-    std::fs::create_dir_all(&dir_path).with_context(|| {
-        format!("Creating/ensuring data directory {:?}", dir_path)
-    })?;
+    std::fs::create_dir_all(&dir_path)
+        .with_context(|| format!("Creating/ensuring data directory {:?}", dir_path))?;
 
     let db_file_path = dir_path.join("library.db");
     let first_time = !db_file_path.exists();
-    tracing::debug!("Resolved data directory: {:?}; db file: {:?}", dir_path, db_file_path);
+    tracing::debug!(
+        "Resolved data directory: {:?}; db file: {:?}",
+        dir_path,
+        db_file_path
+    );
 
     // Handle already-initialized global path.
     if let Some(existing) = DB_PATH.get() {
@@ -46,9 +55,13 @@ pub fn set_db_path(input_path: PathBuf) -> Result<()> {
                 "Attempt to change DB path at runtime from {:?} to {:?}. This is currently unsupported for safety; restart the application to switch.",
                 existing, db_file_path
             );
-            return Err(anyhow!("Database path already set; restart application to change it."));
+            return Err(anyhow!(
+                "Database path already set; restart application to change it."
+            ));
         } else {
-            tracing::debug!("DB path already set to requested path; reusing connection/migrations.");
+            tracing::debug!(
+                "DB path already set to requested path; reusing connection/migrations."
+            );
         }
     }
 
