@@ -103,10 +103,6 @@ pub fn run_migrations(conn: &Connection) -> Result<()> {
     Ok(())
 }
 
-pub fn is_db_configured() -> bool {
-    DB_PATH.get().is_some()
-}
-
 pub fn with_conn<F, R>(f: F) -> Result<R>
 where
     F: FnOnce(&Connection) -> Result<R>,
