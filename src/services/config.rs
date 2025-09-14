@@ -28,8 +28,11 @@ impl Config {
             }
             return Ok(()); // already exists, nothing to do
         }
-    // Write default empty config
-    std::fs::write(&config_path, serde_json::to_string(&Config { data_dir: None })?)?;
+        // Write default empty config
+        std::fs::write(
+            &config_path,
+            serde_json::to_string(&Config { data_dir: None })?,
+        )?;
         Ok(())
     }
 
@@ -41,8 +44,8 @@ impl Config {
                 config_path
             ));
         }
-        let content = std::fs::read_to_string(config_path.clone())
-            .context("Failed to read config file!")?;
+        let content =
+            std::fs::read_to_string(config_path.clone()).context("Failed to read config file!")?;
         if content.trim().is_empty() {
             // Treat empty file as default config
             return Ok(Config { data_dir: None });
@@ -50,7 +53,10 @@ impl Config {
         match serde_json::from_str(&content) {
             Ok(config) => Ok(config),
             Err(e) => {
-                tracing::warn!("Config file malformed ({}). Rewriting default & continuing.", e);
+                tracing::warn!(
+                    "Config file malformed ({}). Rewriting default & continuing.",
+                    e
+                );
                 let default = Config { data_dir: None };
                 std::fs::write(&config_path, serde_json::to_string(&default)?)?;
                 Ok(default)
@@ -60,7 +66,9 @@ impl Config {
 
     pub fn write(&self) -> anyhow::Result<()> {
         let config_path = Self::file_path()?;
-    if let Some(parent) = config_path.parent() { create_dir_all(parent)?; }
+        if let Some(parent) = config_path.parent() {
+            create_dir_all(parent)?;
+        }
         let content = serde_json::to_string(self).context("Failed to serialize Config!")?;
         std::fs::write(config_path, content)
             .context("Failed to write serialized config to file!")?;
@@ -128,6 +136,8 @@ mod tests {
         #[cfg(target_os = "windows")]
         let expected_path =
             PathBuf::from("C:\\Users\\lucaa\\Appdata\\Roaming\\ironscribe\\config\\config.json");
+        #[cfg(target_os = "linux")]
+        let expected_path = PathBuf::from("/home/luca/.config/ironscribe/config/config.json");
         let path = Config::file_path().unwrap();
         assert_eq!(expected_path, path);
     }
