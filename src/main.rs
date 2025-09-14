@@ -1,14 +1,11 @@
-mod config;
-mod database;
-mod frontend;
-// Temporary: legacy modules kept for backward compatibility during refactor
 mod backend;
+mod frontend;
 mod services;
 mod shared;
 
 use crate::frontend::components::App;
 #[cfg(feature = "server")]
-use crate::config::init_config;
+use crate::services::config::init_config;
 
 fn main() {
     #[cfg(feature = "server")]
