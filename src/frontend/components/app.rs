@@ -1,4 +1,4 @@
-use crate::backend::config::{read_config, write_path};
+use crate::config::{read_config, write_path};
 use crate::frontend::components::{Books, Modal};
 use dioxus::prelude::*;
 use std::path::PathBuf;
