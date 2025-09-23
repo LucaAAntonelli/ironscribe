@@ -1,11 +1,6 @@
-mod backend;
-mod frontend;
-mod services;
-mod shared;
-
-use crate::frontend::components::App;
 #[cfg(feature = "server")]
-use crate::services::config::init_config;
+use backend::config::init_config;
+use ui::app::App;
 
 fn main() {
     #[cfg(feature = "server")]
