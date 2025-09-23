@@ -1,6 +1,6 @@
-use crate::shared::types::Config;
 use anyhow::{anyhow, Context};
 use directories::ProjectDirs;
+use shared::types::Config;
 use std::fs::{create_dir_all, File};
 use std::path::{Path, PathBuf};
 

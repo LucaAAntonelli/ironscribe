@@ -1,4 +1,3 @@
-#![cfg(feature = "server")]
 use crate::backend::database::{DB, DB_PATH};
 use anyhow::{anyhow, Context, Result};
 use rusqlite::Connection;
