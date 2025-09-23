@@ -1,8 +1,6 @@
-#[cfg(feature = "server")]
 use crate::services::config::persist_config;
-use crate::shared::types::Config;
-#[cfg(feature = "server")]
 use crate::services::database::set_db_path;
+use crate::shared::types::Config;
 use dioxus::prelude::*;
 use std::path::PathBuf;
 
@@ -39,7 +37,10 @@ pub async fn read_config() -> Result<Config, ServerFnError> {
         // create the directory tree if needed.
         if crate::backend::database::DB_PATH.get().is_none() {
             if let Err(e) = set_db_path(dir.clone()) {
-                tracing::error!("Failed to initialize DB using configured directory {:?}: {e}", dir);
+                tracing::error!(
+                    "Failed to initialize DB using configured directory {:?}: {e}",
+                    dir
+                );
                 cfg.data_dir = None;
             }
         }
