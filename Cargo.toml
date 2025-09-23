@@ -7,6 +7,9 @@ dioxus = { version = "0.6.0" }
 serde = { version = "1.0.219", features = ["derive"] }
 serde_json = { version = "1.0.143" }
 rusqlite = { version = "0.37.0", features = ["bundled", "chrono"] }
+anyhow = "1.0.99"
+directories = "6.0.0"
+tracing = "0.1.41"
 
 ui = { path = "ui" }
 api = { path = "api" }

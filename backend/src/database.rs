@@ -1,9 +1,9 @@
-use crate::backend::database::{DB, DB_PATH};
 use anyhow::{anyhow, Context, Result};
+use backend::database::{DB, DB_PATH};
 use rusqlite::Connection;
 use std::path::PathBuf;
 
-use crate::shared::types::Config;
+use shared::types::Config;
 
 // Provide a directory path; we ensure a file named "library.db" exists/initialized within it.
 pub fn set_db_path(input_path: PathBuf) -> Result<()> {
