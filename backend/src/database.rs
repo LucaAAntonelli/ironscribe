@@ -1,10 +1,9 @@
+use crate::config::Config;
 use anyhow::{anyhow, Context, Result};
 use once_cell::sync::OnceCell;
 use rusqlite::Connection;
 use std::cell::RefCell;
 use std::path::PathBuf;
-
-use shared::types::Config;
 
 pub static DB_PATH: OnceCell<PathBuf> = OnceCell::new();
 

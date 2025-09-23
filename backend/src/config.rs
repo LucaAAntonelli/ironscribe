@@ -1,9 +1,14 @@
 use anyhow::{anyhow, Context};
 use directories::ProjectDirs;
-use shared::types::Config;
+use serde::{Deserialize, Serialize};
 use std::fs::{create_dir_all, File};
 use std::path::{Path, PathBuf};
 
+#[derive(Serialize, Deserialize, Debug, Clone)]
+pub struct Config {
+    // Directory chosen by user to store the application's SQLite file (library.db)
+    pub data_dir: Option<PathBuf>,
+}
 impl Config {
     pub fn file_path() -> anyhow::Result<PathBuf> {
         let proj_dirs =
