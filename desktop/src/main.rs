@@ -1,4 +1,4 @@
-use crate::services::config::init_config;
+use backend::config::init_config;
 use ui::app::App;
 
 fn main() {
