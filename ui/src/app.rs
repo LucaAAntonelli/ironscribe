@@ -1,5 +1,5 @@
-use crate::backend::config::{read_config, write_path};
-use crate::frontend::components::{Books, Modal};
+use crate::{books::Books, path_picker::Modal};
+use api::config::{read_config, write_path};
 use dioxus::prelude::*;
 use std::path::PathBuf;
 
@@ -49,7 +49,8 @@ pub fn App() -> Element {
         }
     };
 
-    let show_modal = matches!(cfg(), Some(Ok(c)) if c.data_dir.is_none()) || matches!(cfg(), Some(Err(_)));
+    let show_modal =
+        matches!(cfg(), Some(Ok(c)) if c.data_dir.is_none()) || matches!(cfg(), Some(Err(_)));
 
     rsx! {
         document::Stylesheet { href: MAIN_CSS }
