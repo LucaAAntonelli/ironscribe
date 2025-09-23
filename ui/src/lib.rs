@@ -1,8 +1,3 @@
-mod app;
-pub use app::App;
-
-mod books;
-pub use books::Books;
-
-mod path_picker;
-pub use path_picker::Modal;
+pub mod app;
+pub mod books;
+pub mod path_picker;

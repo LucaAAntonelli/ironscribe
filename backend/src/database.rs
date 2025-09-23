@@ -1,9 +1,16 @@
 use anyhow::{anyhow, Context, Result};
-use backend::database::{DB, DB_PATH};
+use once_cell::sync::OnceCell;
 use rusqlite::Connection;
+use std::cell::RefCell;
 use std::path::PathBuf;
 
 use shared::types::Config;
+
+pub static DB_PATH: OnceCell<PathBuf> = OnceCell::new();
+
+thread_local! {
+    pub static DB: RefCell<Option<rusqlite::Connection>> = const { RefCell::new(None) };
+}
 
 // Provide a directory path; we ensure a file named "library.db" exists/initialized within it.
 pub fn set_db_path(input_path: PathBuf) -> Result<()> {
