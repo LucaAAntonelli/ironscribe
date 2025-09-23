@@ -57,8 +57,13 @@ checksum = "a23eb6b1614318a8071c9b2521f36b424b2c83db5eb3a0fead4a6c0809af6e61"
 name = "api"
 version = "0.1.0"
 dependencies = [
+ "anyhow",
  "backend",
+ "chrono",
  "dioxus",
+ "serde",
+ "serde_json",
+ "tracing",
 ]
 
 [[package]]
@@ -315,6 +320,7 @@ dependencies = [
  "directories",
  "once_cell",
  "rusqlite",
+ "serde",
  "serde_json",
  "shared",
  "tracing",
@@ -497,6 +503,7 @@ dependencies = [
  "iana-time-zone",
  "js-sys",
  "num-traits",
+ "serde",
  "wasm-bindgen",
  "windows-link",
 ]
@@ -903,6 +910,7 @@ dependencies = [
 name = "desktop"
 version = "0.1.0"
 dependencies = [
+ "backend",
  "dioxus",
  "ui",
 ]
@@ -936,7 +944,6 @@ dependencies = [
  "dioxus-html",
  "dioxus-liveview",
  "dioxus-logger",
- "dioxus-mobile",
  "dioxus-router",
  "dioxus-signals",
  "dioxus-ssr",
@@ -1121,7 +1128,6 @@ dependencies = [
  "dioxus-interpreter-js",
  "dioxus-isrg",
  "dioxus-lib",
- "dioxus-mobile",
  "dioxus-ssr",
  "dioxus-web",
  "dioxus_server_macro",
@@ -1302,20 +1308,6 @@ dependencies = [
  "tracing",
  "tracing-subscriber",
  "tracing-wasm",
-]
-
-[[package]]
-name = "dioxus-mobile"
-version = "0.6.2"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "6d1295388909f427758993f32a571e0f8698d6ce0f125fa0e81b8bfdec3fa952"
-dependencies = [
- "dioxus-cli-config",
- "dioxus-desktop",
- "dioxus-lib",
- "jni",
- "libc",
- "once_cell",
 ]
 
 [[package]]
@@ -1537,6 +1529,12 @@ name = "dunce"
 version = "1.0.5"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "92773504d58c093f6de2459af4af33faa518c13451eb8f2b5698ed3d36e7c813"
+
+[[package]]
+name = "either"
+version = "1.15.0"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "48c757948c5ede0e46177b7add2e67155f70e33c07fea8284df6576da70b3719"
 
 [[package]]
 name = "encoding_rs"
@@ -2638,6 +2636,15 @@ dependencies = [
 ]
 
 [[package]]
+name = "itertools"
+version = "0.14.0"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "2b192c782037fadd9cfa75548310488aabdbf3d2da73885b31bd0abd03351285"
+dependencies = [
+ "either",
+]
+
+[[package]]
 name = "itoa"
 version = "0.4.8"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -2990,14 +2997,6 @@ dependencies = [
  "libc",
  "wasi 0.11.1+wasi-snapshot-preview1",
  "windows-sys 0.59.0",
-]
-
-[[package]]
-name = "mobile"
-version = "0.1.0"
-dependencies = [
- "dioxus",
- "ui",
 ]
 
 [[package]]
@@ -5081,6 +5080,8 @@ version = "0.1.0"
 dependencies = [
  "api",
  "dioxus",
+ "itertools",
+ "tracing",
 ]
 
 [[package]]
@@ -5315,6 +5316,7 @@ dependencies = [
 name = "web"
 version = "0.1.0"
 dependencies = [
+ "backend",
  "dioxus",
  "ui",
 ]
