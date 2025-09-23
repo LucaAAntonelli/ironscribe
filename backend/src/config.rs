@@ -1,4 +1,3 @@
-#![cfg(feature = "server")]
 use crate::shared::types::Config;
 use anyhow::{anyhow, Context};
 use directories::ProjectDirs;
