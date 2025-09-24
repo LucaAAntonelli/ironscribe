@@ -1,6 +1,6 @@
-use backend::config::persist_config;
-use backend::config::Config;
-use backend::database::set_db_path;
+use backend_lib::config::persist_config;
+use backend-lib::config::Config;
+use backend-lib::database::set_db_path;
 use dioxus::prelude::*;
 use std::path::PathBuf;
 
