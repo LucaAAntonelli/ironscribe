@@ -1,5 +1,3 @@
-#[cfg(feature = "server")]
-use backend::config::init_config;
 use ui::app::App;
 
 fn main() {

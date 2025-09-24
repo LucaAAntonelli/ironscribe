@@ -13,6 +13,8 @@ tracing = "0.1.41"
 once_cell = { version = "1.21.3" }
 chrono = { version = "0.4.41", features = ["serde"] }
 itertools = { version = "0.14.0" }
+tokio = { version = "1.47.1" }
+axum = { version = "0.8.4" }
 
 ui = { path = "ui" }
 api = { path = "api" }

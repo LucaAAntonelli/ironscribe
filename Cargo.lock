@@ -317,12 +317,14 @@ name = "backend"
 version = "0.1.0"
 dependencies = [
  "anyhow",
+ "dioxus",
  "directories",
  "once_cell",
  "rusqlite",
  "serde",
  "serde_json",
  "shared",
+ "tokio",
  "tracing",
 ]
 
