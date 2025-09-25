@@ -10,4 +10,9 @@ anyhow = { workspace = true }
 serde = { workspace = true }
 serde_json = { workspace = true }
 chrono = { workspace = true }
-backend = { workspace = true }
+backend = { workspace = true, optional = true }
+
+[features]
+default = []
+# Enable this feature for server builds to pull in the backend crate.
+server = ["backend"]
