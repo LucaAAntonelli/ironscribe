@@ -4351,6 +4351,7 @@ dependencies = [
  "anyhow",
  "axum 0.8.4",
  "dioxus",
+ "serverlib",
  "tokio",
  "tracing",
  "ui",

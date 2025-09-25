@@ -5,8 +5,9 @@ edition = "2021"
 
 [dependencies]
 ui = { workspace = true }
+serverlib = { workspace = true }
 tokio = { workspace = true }
-dioxus = { workspace = true }
+dioxus = { workspace = true, features = ["fullstack"] }
 anyhow = { workspace = true }
 tracing = { workspace = true }
 axum = { workspace = true }

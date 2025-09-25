@@ -1,4 +1,4 @@
-use backend::config::init_config;
+use serverlib::config::init_config;
 use ui::app::App;
 
 fn main() {
