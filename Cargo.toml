@@ -1,6 +1,6 @@
 [workspace]
 resolver = "2"
-members = ["ui", "web", "desktop", "api", "serverbin", "serverlib", "shared"]
+members = ["ui", "web", "desktop", "api", "backend", "shared"]
 
 [workspace.dependencies]
 dioxus = { version = "0.6.0" }
@@ -18,9 +18,8 @@ axum = { version = "0.8.4" }
 
 ui = { path = "ui" }
 api = { path = "api" }
-serverlib = { path = "serverlib" }
-serverbin = { path = "serverbin" }
 shared = { path = "shared" }
+backend = { path = "backend" }
 
 [profile]
 
