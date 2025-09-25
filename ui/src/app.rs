@@ -1,5 +1,5 @@
 use crate::{books::Books, path_picker::Modal};
-use api::config::{read_config, write_path};
+use api::config::{init_config_server, read_config, write_path};
 use dioxus::prelude::*;
 use std::path::PathBuf;
 
@@ -9,6 +9,16 @@ const MAIN_CSS: Asset = asset!("assets/main.css");
 #[component]
 pub fn App() -> Element {
     let mut committed = use_signal(String::new);
+
+    // Kick off config initialization (idempotent) via a server function so that
+    // the web crate no longer calls backend code directly in its main(). We ignore
+    // the result here; any errors will surface again when read_config runs.
+    let init_cfg = use_server_future(|| init_config_server())?;
+    use_effect(move || {
+        if let Some(Err(e)) = init_cfg() {
+            tracing::warn!("Config init failed: {}", e);
+        }
+    });
 
     // Config future; key it on a state value so we can refetch after user input
     let config_reload_key = use_signal(|| 0u64);
