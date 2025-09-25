@@ -1,7 +1,7 @@
+use backend::config::persist_config;
+use backend::config::Config;
+use backend::database::set_db_path;
 use dioxus::prelude::*;
-use serverlib::config::persist_config;
-use serverlib::config::Config;
-use serverlib::database::set_db_path;
 use std::path::PathBuf;
 
 #[server]
@@ -35,7 +35,7 @@ pub async fn read_config() -> Result<Config, ServerFnError> {
     if let Some(dir) = cfg.data_dir.clone() {
         // Always attempt to set path (handles both existing and non-existing directories). It will
         // create the directory tree if needed.
-        if serverlib::database::DB_PATH.get().is_none() {
+        if backend::database::DB_PATH.get().is_none() {
             if let Err(e) = set_db_path(dir.clone()) {
                 tracing::error!(
                     "Failed to initialize DB using configured directory {:?}: {e}",
