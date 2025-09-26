@@ -9,14 +9,23 @@ pub struct AppConfig {
     pub data_dir: Option<PathBuf>,
 }
 
+// TODO: get rid of duplicate AppConfig struct and just use Config everywhere
 #[cfg(feature = "server")]
 impl From<backend::config::Config> for AppConfig {
-    fn from(c: backend::config::Config) -> Self { Self { data_dir: c.data_dir } }
+    fn from(c: backend::config::Config) -> Self {
+        Self {
+            data_dir: c.data_dir,
+        }
+    }
 }
 
 #[cfg(feature = "server")]
 impl From<AppConfig> for backend::config::Config {
-    fn from(c: AppConfig) -> Self { backend::config::Config { data_dir: c.data_dir } }
+    fn from(c: AppConfig) -> Self {
+        backend::config::Config {
+            data_dir: c.data_dir,
+        }
+    }
 }
 
 #[server]
@@ -39,8 +48,11 @@ pub async fn create_config() -> Result<(), ServerFnError> {
             "Failed to check file system: {e}"
         ))),
     }
+    // TODO: figure out if this is really needed
     #[cfg(not(feature = "server"))]
-    { Ok(()) }
+    {
+        Ok(())
+    }
 }
 
 #[server]
@@ -67,9 +79,13 @@ pub async fn read_config() -> Result<AppConfig, ServerFnError> {
         }
     }
     #[cfg(feature = "server")]
-    { Ok(AppConfig::from(cfg)) }
+    {
+        Ok(AppConfig::from(cfg))
+    }
     #[cfg(not(feature = "server"))]
-    { Ok(cfg) }
+    {
+        Ok(cfg)
+    }
 }
 
 #[server]
@@ -91,8 +107,10 @@ pub async fn write_path(path: PathBuf) -> Result<(), ServerFnError> {
 #[server]
 pub async fn persist_path(path: PathBuf) -> Result<(), ServerFnError> {
     #[cfg(feature = "server")]
-    backend::config::persist_config(backend::config::Config { data_dir: Some(path) })
-        .map_err(ServerFnError::new)?;
+    backend::config::persist_config(backend::config::Config {
+        data_dir: Some(path),
+    })
+    .map_err(ServerFnError::new)?;
     Ok(())
 }
 
@@ -103,6 +121,8 @@ pub async fn persist_path(path: PathBuf) -> Result<(), ServerFnError> {
 #[server]
 pub async fn init_config_server() -> Result<(), ServerFnError> {
     #[cfg(feature = "server")]
-    backend::config::init_config().map(|_| ()).map_err(ServerFnError::new)?;
+    backend::config::init_config()
+        .map(|_| ())
+        .map_err(ServerFnError::new)?;
     Ok(())
 }
