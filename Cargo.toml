@@ -1,33 +1,25 @@
-[package]
-name = "ironscribe"
-version = "0.1.0"
-authors = ["Luca <luca.antonelli@gmx.ch>"]
-edition = "2021"
+[workspace]
+resolver = "2"
+members = ["ui", "web", "desktop", "api", "backend", "shared"]
 
-# See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
-
-[dependencies]
-dioxus = { version = "0.6.0", features = ["fullstack", "router"] }
-reqwest = { version = "0.12.22", features = ["json"] }
+[workspace.dependencies]
+dioxus = { version = "0.6.0" }
 serde = { version = "1.0.219", features = ["derive"] }
-rusqlite = { version = "0.37.0", optional = true, features = [
-  "bundled",
-  "chrono",
-] }
-once_cell = { version = "1.21.3", optional = true }
-serde_json = { version = "1.0.143", optional = true }
-itertools = { version = "0.14.0" }
-chrono = { version = "0.4.41", features = ["serde"] }
-tracing = "0.1.41"
-directories = "6.0.0"
+serde_json = { version = "1.0.143" }
+rusqlite = { version = "0.37.0", features = ["bundled", "chrono"] }
 anyhow = "1.0.99"
+directories = "6.0.0"
+tracing = "0.1.41"
+once_cell = { version = "1.21.3" }
+chrono = { version = "0.4.41", features = ["serde"] }
+itertools = { version = "0.14.0" }
+tokio = { version = "1.47.1", features = ["rt-multi-thread"] }
+axum = { version = "0.8.4" }
 
-[features]
-default = []
-web = ["dioxus/web"]
-desktop = ["dioxus/desktop"]
-mobile = ["dioxus/mobile"]
-server = ["dioxus/server", "dep:rusqlite", "dep:serde_json", "dep:once_cell"]
+ui = { path = "ui" }
+api = { path = "api" }
+shared = { path = "shared" }
+backend = { path = "backend" }
 
 [profile]
 

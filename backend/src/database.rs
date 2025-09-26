@@ -1,10 +1,15 @@
-#![cfg(feature = "server")]
-use crate::backend::database::{DB, DB_PATH};
+use crate::config::Config;
 use anyhow::{anyhow, Context, Result};
+use once_cell::sync::OnceCell;
 use rusqlite::Connection;
+use std::cell::RefCell;
 use std::path::PathBuf;
 
-use crate::shared::types::Config;
+pub static DB_PATH: OnceCell<PathBuf> = OnceCell::new();
+
+thread_local! {
+    pub static DB: RefCell<Option<rusqlite::Connection>> = const { RefCell::new(None) };
+}
 
 // Provide a directory path; we ensure a file named "library.db" exists/initialized within it.
 pub fn set_db_path(input_path: PathBuf) -> Result<()> {

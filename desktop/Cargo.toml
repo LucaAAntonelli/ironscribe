@@ -1,0 +1,14 @@
+[package]
+name = "desktop"
+version = "0.1.0"
+edition = "2021"
+
+[dependencies]
+dioxus = { workspace = true, features = ["router"] }
+ui = { workspace = true }
+backend = { workspace = true }
+
+[features]
+default = []
+desktop = ["dioxus/desktop"]
+server = ["dioxus/server"]

@@ -1,20 +1,14 @@
 #[cfg(feature = "server")]
-use crate::services::database::with_conn;
+use backend::database::with_conn;
+#[cfg(feature = "server")]
+use dioxus::prelude::server_fn::error::NoCustomError;
 use chrono::{DateTime, Utc};
 use std::{cmp::Ordering, fmt::Display};
 
 #[cfg(feature = "server")]
 use anyhow::anyhow;
-#[cfg(feature = "server")]
-use dioxus::prelude::server_fn::error::NoCustomError;
 use dioxus::prelude::*;
-#[cfg(feature = "server")]
-use once_cell::sync::OnceCell;
 use serde::{Deserialize, Serialize};
-#[cfg(feature = "server")]
-use std::cell::RefCell;
-#[cfg(feature = "server")]
-use std::path::PathBuf;
 #[derive(Serialize, Deserialize, Clone)]
 pub struct BookRecords {
     pub records: Vec<BookRecord>,
@@ -113,16 +107,15 @@ impl BookRecord {
     }
 }
 
-#[cfg(feature = "server")]
-pub static DB_PATH: OnceCell<PathBuf> = OnceCell::new();
-
-#[cfg(feature = "server")]
-thread_local! {
-    pub static DB: RefCell<Option<rusqlite::Connection>> = const { RefCell::new(None) };
-}
-
 #[server]
 pub async fn list_books() -> Result<BookRecords, ServerFnError> {
+    #[cfg(not(feature = "server"))]
+    {
+        // The actual query runs only on the server. The client (wasm) gets the
+        // serialized result back so this branch should never execute meaningfully.
+        return Ok(BookRecords { records: vec![] });
+    }
+    #[cfg(feature = "server")]
     let query = r#"WITH series_info AS (
                 SELECT
                     bsl.book,
@@ -156,6 +149,7 @@ pub async fn list_books() -> Result<BookRecords, ServerFnError> {
                 JOIN authors_info ON authors_info.book = books.id
             ORDER BY
                 books.date_added ASC"#;
+    #[cfg(feature = "server")]
     let books = with_conn(|conn| {
         let mut stmt = conn.prepare(query)?;
         let rows = stmt.query_map([], |row| {
@@ -181,5 +175,6 @@ pub async fn list_books() -> Result<BookRecords, ServerFnError> {
     })
     .map_err(|e| -> ServerFnError<NoCustomError> { ServerFnError::ServerError(e.to_string()) })?;
 
-    Ok(BookRecords { records: books })
+    #[cfg(feature = "server")]
+    return Ok(BookRecords { records: books });
 }
