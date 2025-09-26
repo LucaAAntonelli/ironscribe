@@ -4,7 +4,6 @@ version = "0.1.0"
 edition = "2021"
 
 [dependencies]
-shared = { workspace = true }
 rusqlite = { workspace = true }
 dioxus = { workspace = true }
 serde = { workspace = true }
