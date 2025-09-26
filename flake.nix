@@ -80,8 +80,6 @@
               libsoup_3
               pango
               webkitgtk_4_1
-              just
-              bacon
             ];
             RUST_SRC_PATH = rustPlatform.rustLibSrc;
             LD_LIBRARY_PATH = libPath;
