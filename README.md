@@ -12,6 +12,22 @@ A server-client application for ebook syncing and management written in Rust
     - [ ] Book metadata
   - [ ] Analytics
 
+## Minimum Viable Product
+
+The essential features are those that I'm currently actually using in calibre and calibre-web. Anything beyond that is just nice-to-have, and is more intended as a future improvement to make working with this app more comfortable.
+
+- [ ] List books that are stored in a directory
+- [ ] Add new books with the help of a button
+- [ ] Configure a folder where books are automatically detected and added to the library
+- [ ] Edit book metadata
+- [ ] Automatically format books when added
+  - [ ] Rename appropriately (e.g. "{title}, {first author}")
+  - [ ] Extract cover and save alongside book
+  - [ ] Format content
+- [ ] Track TBR - currently reading - read (currently done with Excel sheets, not calibre per se)
+
+Because the project is already quite large, it is important to specify exact features that are needed to achieve a MVP version. There are lots of other features and improvements that can be made, but they're way less essential to the project than the MVP features, or they might even rely on those features. For example, tracking the list of books I've read is something I'm already doing with a list in Excel, but in the end I'd definitely want to graphically display this information. Or I might want to be able to drag books between TBR, currently reading and read sections in a GUI, but for that I need to just handle tracking itself first.
+
 ## Technical Planning
 
 Initially, the plan was to implement some sort of sync for keeping the library shared between devices, most likely using gRPC with the tonic crate. But this turned out much harder than anticipated, and so for now, this endeavor has been postponed indefinitely.
@@ -19,7 +35,9 @@ Initially, the plan was to implement some sort of sync for keeping the library s
 Instead, I focus on the necessary features to have a suitable replacement for calibre and calibre-web. The current tech stack looks as follows:
 
 - GUI with dioxus (fullstack)
-- database with SQLite using the rusqlite crate
+  - For desktop use, compile to native desktop app
+  - For use on devices without the app, compile to web app and run the backend on a server
+- database with SQLite using the `rusqlite` crate
 
 ### Database
 
