@@ -1,16 +1,19 @@
 # UI
 
-This crate contains all shared components for the workspace. This is a great place to place any UI you would like to use in multiple platforms like a common `Button` or `Navbar` component.
+This crate contains all shared components for the workspace. Any UI component that is not platform-specific goes in here.
 
 ```
 ui/
+├─ assets/
+│  ├─ favicon.ico # The icon that is used, e.g., for the native app icon or the tab in the browser
+│  ├─ main.css # CSS definitions for the UI components
 ├─ src/
 │  ├─ lib.rs # The entrypoint for the ui crate
-│  ├─ hero.rs # The Hero component that will be used in every platform
-│  ├─ echo.rs # The shared echo component that communicates with the server
-│  ├─ navbar.rs # The Navbar component that will be used in the layout of every platform's router
+│  ├─ books.rs # The book table component
+│  ├─ app.rs # The main app component, this is what's launched when the app starts (web and native)
+│  ├─ path_picker.rs # The component that is launched when no library path has been set in the config
 ```
 
 ## Dependencies
 
-Since this crate is shared between multiple platforms, it should not pull in any platform specific dependencies. For example, if you want to use the `web_sys` crate in the web build of your app, you should not add it to this crate. Instead, you should add platform specific dependencies to the [web](../web/Cargo.toml), [desktop](../desktop/Cargo.toml), or [mobile](../mobile/Cargo.toml) crates.
+Since this crate is shared between multiple platforms, it should not pull in any platform specific dependencies. Instead, pure frontend dependencies like `web-sys` should be added to the `web` crate as a frontend-only dependency.
