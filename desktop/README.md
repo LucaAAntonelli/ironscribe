@@ -1,10 +1,10 @@
 # Development
 
-The desktop crate defines the entrypoint for the desktop app along with any assets, components and dependencies that are specific to desktop builds. The desktop crate starts out something like this:
+The desktop crate defines the entrypoint for the desktop app along with any assets, components and dependencies that are specific to desktop builds.
 
 ```
 desktop/
-├─ assets/ # Assets used by the desktop app - Any platform specific assets should go in this folder
+├─ assets/ # Assets used by the desktop app
 ├─ src/
 │  ├─ main.rs # The entrypoint for the desktop app.It also defines the routes for the desktop platform
 │  ├─ views/ # The views each route will render in the desktop version of the app
@@ -15,15 +15,17 @@ desktop/
 ```
 
 ## Dependencies
-Since you have fullstack enabled, the desktop crate will be built two times:
+
+Since this is a fullstack project, the desktop crate will be built two times:
+
 1. Once for the server build with the `server` feature enabled
 2. Once for the client build with the `desktop` feature enabled
 
-You should make all desktop specific dependencies optional and only enabled in the `desktop` feature. This will ensure that the server builds don't pull in desktop specific dependencies which cuts down on build times significantly.
-
 ### Serving Your Desktop App
 
-You can start your desktop app with the following command:
+During development, the app is launched natively with
 
 ```bash
-dx serve
+dx serve --package desktop
+
+when running from the top-level directory of the project.
