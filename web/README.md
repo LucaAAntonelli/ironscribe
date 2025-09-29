@@ -7,8 +7,8 @@ The structure of the crate is as follows:
 ```
 web/
 ├─ src/
-│  ├─ main.rs # The entrypoint for the web app.It also defines the routes for the web platform
-├─ Cargo.toml # The web crate's Cargo.toml - This should include all web specific dependencies
+│  └─ main.rs # The entrypoint for the web app.It also defines the routes for the web platform
+└─ Cargo.toml # The web crate's Cargo.toml - This should include all web specific dependencies
 ```
 
 Because there is currently no UI element that is specific to any target, every component is defined in the `ui` crate and retrieved via the dependency.

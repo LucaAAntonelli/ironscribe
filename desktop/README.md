@@ -10,8 +10,8 @@ desktop/
 │  ├─ views/ # The views each route will render in the desktop version of the app
 │  │  ├─ mod.rs # Defines the module for the views route and re-exports the components for each route
 │  │  ├─ blog.rs # The component that will render at the /blog/:id route
-│  │  ├─ home.rs # The component that will render at the / route
-├─ Cargo.toml # The desktop crate's Cargo.toml - This should include all desktop specific dependencies
+│  │  └─ home.rs # The component that will render at the / route
+└ Cargo.toml # The desktop crate's Cargo.toml - This should include all desktop specific dependencies
 ```
 
 ## Dependencies
