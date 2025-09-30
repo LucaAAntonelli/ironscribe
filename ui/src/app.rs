@@ -13,7 +13,7 @@ pub fn App() -> Element {
     // Kick off config initialization (idempotent) via a server function so that
     // the web crate no longer calls backend code directly in its main(). We ignore
     // the result here; any errors will surface again when read_config runs.
-    let init_cfg = use_server_future(|| init_config_server())?;
+    let init_cfg = use_server_future(init_config_server)?;
     use_effect(move || {
         if let Some(Err(e)) = init_cfg() {
             tracing::warn!("Config init failed: {}", e);
