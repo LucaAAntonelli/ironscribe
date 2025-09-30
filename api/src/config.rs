@@ -72,25 +72,8 @@ pub async fn read_config() -> Result<AppConfig, ServerFnError> {
 }
 
 #[server]
-pub async fn write_config(config: AppConfig) -> Result<(), ServerFnError> {
-    backend::config::Config::from(config)
-        .write()
-        .map_err(ServerFnError::new)?;
-    Ok(())
-}
-
-#[server]
 pub async fn write_path(path: PathBuf) -> Result<(), ServerFnError> {
     backend::database::set_db_path(path).map_err(ServerFnError::new)?;
-    Ok(())
-}
-
-#[server]
-pub async fn persist_path(path: PathBuf) -> Result<(), ServerFnError> {
-    backend::config::persist_config(backend::config::Config {
-        data_dir: Some(path),
-    })
-    .map_err(ServerFnError::new)?;
     Ok(())
 }
 
