@@ -112,23 +112,6 @@ pub fn init_config() -> anyhow::Result<Config> {
     Err(anyhow!("Failed to generate config folder path!"))
 }
 
-pub fn persist_config(config: Config) -> anyhow::Result<()> {
-    if let Some(proj_dirs) = ProjectDirs::from("", "", "ironscribe") {
-        let config_directory_path = proj_dirs.config_dir();
-        create_dir_all(config_directory_path)?;
-        let config_file_path = config_directory_path.join("config.json");
-        let config_file_path = config_file_path.as_path();
-
-        // Serialize config to JSON string
-        let config_json_str = serde_json::to_string(&config)?;
-
-        // Write JSON to config file
-        std::fs::write(config_file_path, config_json_str)?;
-        return Ok(());
-    }
-    Err(anyhow!("Failed to generate config folder path!"))
-}
-
 #[cfg(test)]
 mod tests {
     use super::*;
