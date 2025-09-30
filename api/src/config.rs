@@ -30,7 +30,6 @@ impl From<AppConfig> for backend::config::Config {
 
 #[server]
 pub async fn create_config() -> Result<(), ServerFnError> {
-    #[cfg(feature = "server")]
     match backend::config::Config::file_exists() {
         Ok(exists) => {
             if exists {
@@ -48,26 +47,17 @@ pub async fn create_config() -> Result<(), ServerFnError> {
             "Failed to check file system: {e}"
         ))),
     }
-    // TODO: figure out if this is really needed
-    #[cfg(not(feature = "server"))]
-    {
-        Ok(())
-    }
 }
 
 #[server]
 pub async fn read_config() -> Result<AppConfig, ServerFnError> {
     create_config().await?;
-    #[cfg(feature = "server")]
     let mut cfg = backend::config::Config::read().map_err(ServerFnError::new)?;
-    #[cfg(not(feature = "server"))]
-    let mut cfg = AppConfig { data_dir: None }; // placeholder
 
     // If a path (directory) is configured, validate it exists (or can be created) and open/create DB inside.
     if let Some(dir) = cfg.data_dir.clone() {
         // Always attempt to set path (handles both existing and non-existing directories). It will
         // create the directory tree if needed.
-        #[cfg(feature = "server")]
         if backend::database::DB_PATH.get().is_none() {
             if let Err(e) = backend::database::set_db_path(dir.clone()) {
                 tracing::error!(
@@ -78,19 +68,11 @@ pub async fn read_config() -> Result<AppConfig, ServerFnError> {
             }
         }
     }
-    #[cfg(feature = "server")]
-    {
-        Ok(AppConfig::from(cfg))
-    }
-    #[cfg(not(feature = "server"))]
-    {
-        Ok(cfg)
-    }
+    Ok(AppConfig::from(cfg))
 }
 
 #[server]
 pub async fn write_config(config: AppConfig) -> Result<(), ServerFnError> {
-    #[cfg(feature = "server")]
     backend::config::Config::from(config)
         .write()
         .map_err(ServerFnError::new)?;
@@ -99,14 +81,12 @@ pub async fn write_config(config: AppConfig) -> Result<(), ServerFnError> {
 
 #[server]
 pub async fn write_path(path: PathBuf) -> Result<(), ServerFnError> {
-    #[cfg(feature = "server")]
     backend::database::set_db_path(path).map_err(ServerFnError::new)?;
     Ok(())
 }
 
 #[server]
 pub async fn persist_path(path: PathBuf) -> Result<(), ServerFnError> {
-    #[cfg(feature = "server")]
     backend::config::persist_config(backend::config::Config {
         data_dir: Some(path),
     })
