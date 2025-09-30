@@ -26,8 +26,7 @@ impl Config {
             // If it's a file we are done; if it's a directory, that's an error from previous buggy runs
             if config_path.is_dir() {
                 return Err(anyhow!(
-                    "A directory exists where the config file should be: {:?}",
-                    config_path
+                    "A directory exists where the config file should be: {config_path:?}"
                 ));
             }
             return Ok(()); // already exists, nothing to do
@@ -44,8 +43,7 @@ impl Config {
         let config_path = Self::file_path()?;
         if config_path.is_dir() {
             return Err(anyhow!(
-                "Expected config file but found a directory at {:?}. Please remove or rename it.",
-                config_path
+                "Expected config file but found a directory at {config_path:?}. Please remove or rename it."
             ));
         }
         let content =
