@@ -120,7 +120,6 @@ pub async fn persist_path(path: PathBuf) -> Result<(), ServerFnError> {
 // we avoid direct backend calls in the web entrypoint.
 #[server]
 pub async fn init_config_server() -> Result<(), ServerFnError> {
-    #[cfg(feature = "server")]
     backend::config::init_config()
         .map(|_| ())
         .map_err(ServerFnError::new)?;
