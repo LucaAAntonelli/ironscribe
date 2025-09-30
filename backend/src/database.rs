@@ -38,8 +38,7 @@ pub fn set_db_path(input_path: PathBuf) -> Result<()> {
     // Ensure directory exists (create full tree). If a non-directory exists at that path -> error.
     if dir_path.exists() && !dir_path.is_dir() {
         return Err(anyhow!(
-            "Provided path exists but is not a directory: {:?}",
-            dir_path
+            "Provided path exists but is not a directory: {dir_path:?}"
         ));
     }
     std::fs::create_dir_all(&dir_path)
