@@ -35,7 +35,7 @@ impl ConfigInterface for AppConfig {
             return Ok(config); // already exists, nothing to do
         }
         // Write default empty config
-        let config = AppConfig { data_dir: None };
+        let config = AppConfig::default();
         config.write()?;
         Ok(config)
     }
