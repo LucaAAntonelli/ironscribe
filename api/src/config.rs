@@ -1,6 +1,25 @@
+#[cfg(feature = "backend")]
+use backend::config::ConfigInterface;
 use dioxus::prelude::*;
 use shared::types::AppConfig;
 use std::path::PathBuf;
+
+#[server]
+pub async fn initialize_config() -> Result<AppConfig, ServerFnError> {
+    let config = AppConfig::new()?;
+    Ok(config)
+}
+
+#[server]
+pub async fn read_config() -> Result<AppConfig, ServerFnError> {
+    let config = AppConfig::read()?;
+    Ok(config)
+}
+
+#[server]
+pub async fn write_config(config: AppConfig) -> Result<(), ServerFnError> {
+    config.write()
+}
 
 #[server]
 pub async fn create_config() -> Result<(), ServerFnError> {
