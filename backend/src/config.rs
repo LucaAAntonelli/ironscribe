@@ -1,6 +1,5 @@
 use anyhow::{anyhow, Context};
 use directories::ProjectDirs;
-use serde::{Deserialize, Serialize};
 use shared::types::AppConfig;
 use std::fs::{create_dir_all, File};
 use std::path::{Path, PathBuf};
@@ -18,7 +17,7 @@ trait ConfigInterface: Sized {
     fn new() -> anyhow::Result<Self>;
 
     /// Read the config file. Fails if no file exists yet.
-    fn read(&self) -> anyhow::Result<Self>;
+    fn read() -> anyhow::Result<Self>;
 
     /// Write the state of the config object into the config file
     fn write(&self) -> anyhow::Result<()>;
@@ -26,15 +25,33 @@ trait ConfigInterface: Sized {
 
 impl ConfigInterface for AppConfig {
     fn new() -> anyhow::Result<Self> {
-        Ok(Self { data_dir: None })
+        let config_path = Self::config_path()?;
+        if let Some(parent) = config_path.parent() {
+            create_dir_all(parent)?;
+        }
+        if Path::exists(config_path.as_path()) {
+            // If it's a file we are done; if it's a directory, that's an error from previous buggy runs
+            let config = Self::read()?;
+            return Ok(config); // already exists, nothing to do
+        }
+        // Write default empty config
+        let config = AppConfig { data_dir: None };
+        config.write()?;
+        Ok(config)
     }
 
-    fn read(&self) -> anyhow::Result<Self> {
-        Ok(Self { data_dir: None })
+    fn read() -> anyhow::Result<Self> {
+        let path = Self::config_path()?;
+        let content = std::fs::read_to_string(path).context("Failed to read config file!")?;
+
+        serde_json::from_str(&content)
+            .map_err(|_| anyhow!("Failed to parse config into AppConfig!"))
     }
 
     fn write(&self) -> anyhow::Result<()> {
-        Ok(())
+        let content = serde_json::to_string(self)?;
+        std::fs::write(Self::config_path()?, content)
+            .map_err(|_| anyhow!("Failed to write config into file!"))
     }
 }
 
