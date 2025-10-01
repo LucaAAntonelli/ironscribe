@@ -1,7 +1,8 @@
-use crate::config::Config;
+use crate::config::ConfigInterface;
 use anyhow::{anyhow, Context, Result};
 use once_cell::sync::OnceCell;
 use rusqlite::Connection;
+use shared::types::AppConfig;
 use std::cell::RefCell;
 use std::path::PathBuf;
 
@@ -86,7 +87,7 @@ pub fn set_db_path(input_path: PathBuf) -> Result<()> {
     });
 
     // Persist the directory (not the file path) in config (overwrite if legacy file path was there)
-    let mut cfg = Config::read()?;
+    let mut cfg = AppConfig::read()?;
     if cfg.data_dir.as_ref() != Some(&dir_path) {
         cfg.data_dir = Some(dir_path.clone());
         cfg.write()?;
