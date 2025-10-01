@@ -39,13 +39,6 @@ impl ConfigInterface for AppConfig {
 }
 
 impl Config {
-    pub fn file_path() -> anyhow::Result<PathBuf> {
-        let proj_dirs =
-            ProjectDirs::from("", "", "ironscribe").context("failed to determine config path")?;
-        let config_path = proj_dirs.config_dir().join("config.json");
-        Ok(config_path)
-    }
-
     pub fn init() -> anyhow::Result<()> {
         let config_path = Self::file_path()?;
         if let Some(parent) = config_path.parent() {
