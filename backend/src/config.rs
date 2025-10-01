@@ -1,8 +1,38 @@
 use anyhow::{anyhow, Context};
 use directories::ProjectDirs;
 use serde::{Deserialize, Serialize};
+use shared::types::AppConfig;
 use std::fs::{create_dir_all, File};
 use std::path::{Path, PathBuf};
+
+trait ConfigInterface: Sized {
+    fn config_path() -> anyhow::Result<PathBuf> {
+        let proj_dirs =
+            ProjectDirs::from("", "", "ironscribe").context("failed to determine config path")?;
+        let path = proj_dirs.config_dir().join("config.json");
+        Ok(path)
+    }
+
+    fn new() -> anyhow::Result<Self>;
+
+    fn read(&self) -> anyhow::Result<Self>;
+
+    fn write(&self) -> anyhow::Result<()>;
+}
+
+impl ConfigInterface for AppConfig {
+    fn new() -> anyhow::Result<Self> {
+        Ok(Self { data_dir: None })
+    }
+
+    fn read(&self) -> anyhow::Result<Self> {
+        Ok(Self { data_dir: None })
+    }
+
+    fn write(&self) -> anyhow::Result<()> {
+        Ok(())
+    }
+}
 
 #[derive(Serialize, Deserialize, Debug, Clone)]
 pub struct Config {

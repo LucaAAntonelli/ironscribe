@@ -324,6 +324,7 @@ dependencies = [
  "rusqlite",
  "serde",
  "serde_json",
+ "shared",
  "tracing",
 ]
 

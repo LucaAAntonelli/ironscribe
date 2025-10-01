@@ -1,32 +1,6 @@
 use dioxus::prelude::*;
-use serde::{Deserialize, Serialize};
+use shared::types::AppConfig;
 use std::path::PathBuf;
-
-// Lightweight config representation usable on the client (wasm) without depending
-// on the backend crate (which pulls in rusqlite and native libs).
-#[derive(Serialize, Deserialize, Debug, Clone)]
-pub struct AppConfig {
-    pub data_dir: Option<PathBuf>,
-}
-
-// TODO: get rid of duplicate AppConfig struct and just use Config everywhere
-#[cfg(feature = "server")]
-impl From<backend::config::Config> for AppConfig {
-    fn from(c: backend::config::Config) -> Self {
-        Self {
-            data_dir: c.data_dir,
-        }
-    }
-}
-
-#[cfg(feature = "server")]
-impl From<AppConfig> for backend::config::Config {
-    fn from(c: AppConfig) -> Self {
-        backend::config::Config {
-            data_dir: c.data_dir,
-        }
-    }
-}
 
 #[server]
 pub async fn create_config() -> Result<(), ServerFnError> {
