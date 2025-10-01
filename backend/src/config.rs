@@ -13,10 +13,14 @@ trait ConfigInterface: Sized {
         Ok(path)
     }
 
+    /// Create new config file. Does not do anything if the file exists already
+    /// Returns the created or found file
     fn new() -> anyhow::Result<Self>;
 
+    /// Read the config file. Fails if no file exists yet.
     fn read(&self) -> anyhow::Result<Self>;
 
+    /// Write the state of the config object into the config file
     fn write(&self) -> anyhow::Result<()>;
 }
 
