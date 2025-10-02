@@ -1,5 +1,6 @@
 use crate::{books::Books, path_picker::Modal};
-use api::config::{init_config_server, read_config, write_path};
+// use api::config::{init_config_server, read_config, write_path};
+use api::config::{initialize_config, read_config, write_config, write_path};
 use dioxus::prelude::*;
 use std::path::PathBuf;
 
@@ -13,7 +14,7 @@ pub fn App() -> Element {
     // Kick off config initialization (idempotent) via a server function so that
     // the web crate no longer calls backend code directly in its main(). We ignore
     // the result here; any errors will surface again when read_config runs.
-    let init_cfg = use_server_future(init_config_server)?;
+    let init_cfg = use_server_future(initialize_config)?;
     use_effect(move || {
         if let Some(Err(e)) = init_cfg() {
             tracing::warn!("Config init failed: {}", e);
@@ -76,7 +77,8 @@ pub fn App() -> Element {
                         let mut config_reload_key = config_reload_key.to_owned();
                         let mut books_reload_key = books_reload_key.to_owned();
                         async move {
-                            match write_path(PathBuf::from(&s)).await {
+                            let config = cfg().unwrap().unwrap();
+                            match write_config(config).await {
                                 Ok(_) => {
                                     config_reload_key.set(config_reload_key() + 1);
                                     books_reload_key.set(books_reload_key() + 1);
